@@ -34,6 +34,10 @@ cd mpc-ios-example
 # tKey iOS - (TSS) example application
 
 This repository is an example application created by implementing the [MPC tkey iOS SDK](https://github.com/tkey/tkey-ios/tree/alpha) and [CustomAuth swift SDK](https://github.com/torusresearch/customauth-swift-sdk/tree/alpha).
-With this example app, you can test the various functions of the tkey SDK, and also google Social Login.
+With this example app, you can test the various functions of the tkey SDK and also google Social Login.
 
-After building the app, you can login via your google account.
+After building the app, you can login via your Google account.
+
+## Video Walkthrough
+
+[New MPC iOS Demo App](https://github-production-user-asset-6210df.s3.amazonaws.com/6962565/260696332-b3202464-d5f7-4e26-9d64-a325bf01a3bd.mp4)
