@@ -1,11 +1,11 @@
-# Web3Auth MPC tKey iOS Example with Google login.
+# Web3Auth MPC iOS Example with Google login.
 
 [![Web3Auth](https://img.shields.io/badge/Web3Auth-SDK-green)](https://web3auth.io/docs/sdk/core-kit/mpc-tkey-ios)
 [![Web3Auth](https://img.shields.io/badge/Web3Auth-Community-cyan)](https://web3auth.io/community)
 
 [Join our Community Portal](https://web3auth.io/community) to get support and stay up to date with the latest news and updates.
 
-This example demonstrates how to use Web3Auth's MPC tKey iOS SDK in your iOS app.
+This example demonstrates how to use Web3Auth's MPC iOS SDK in your iOS application.
 
 ## How to Use
 
