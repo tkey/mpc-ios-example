@@ -7,7 +7,6 @@ import SwiftUI
 import tkey_pkg
 import TorusUtils
 import tss_client_swift
-import web3
 
 func helperTssClient(threshold_key: ThresholdKey, factorKey: String, verifier: String, verifierId: String, tssEndpoints: [String], nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws -> (TSSClient, [String: String]) {
     let selected_tag = try TssModule.get_tss_tag(threshold_key: threshold_key)
@@ -137,7 +136,7 @@ struct TssView: View {
 //            Alert(title: Text("Alert"), message: Text(alertContent), dismissButton: .default(Text("Ok")))
 //        }
 
-        let tss_tags = try! threshold_key.get_all_tss_tags()
+//        let tss_tags = try! threshold_key.get_all_tss_tags()
         
 
 //        if !tss_tags.isEmpty {
@@ -341,9 +340,9 @@ struct TssView: View {
                         let (client, coeffs) = try await helperTssClient(threshold_key: threshold_key, factorKey: factorKey, verifier: verifier, verifierId: verifierId, tssEndpoints: tssEndpoints, nodeDetails: nodeDetails!, torusUtils: torusUtils!)
 
                         // wait for sockets to connect
-                        var connected = false
-                        while !connected {
-                            connected = try client.checkConnected()
+                        let connected = try client.checkConnected()
+                        if !connected {
+                            throw RuntimeError("client is not connected")
                         }
 
                         // Create a precompute, each server also creates a precompute.
@@ -354,8 +353,10 @@ struct TssView: View {
                         // Once ~checkpt123_raw is received, precompute_complete notifications should be received shortly thereafter.
                         let precompute = try client.precompute(serverCoeffs: coeffs, signatures: sigs)
 
-                        while !(try client.isReady()) {
-                            // no-op
+                        let ready = try client.isReady()
+                        
+                        if !ready {
+                            throw RuntimeError("client is not ready")
                         }
 
                         // hash a message
