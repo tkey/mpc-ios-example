@@ -136,7 +136,7 @@ struct TssView: View {
 //            Alert(title: Text("Alert"), message: Text(alertContent), dismissButton: .default(Text("Ok")))
 //        }
 
-        let tss_tags = try! threshold_key.get_all_tss_tags()
+//        let tss_tags = try! threshold_key.get_all_tss_tags()
         
 
 //        if !tss_tags.isEmpty {
