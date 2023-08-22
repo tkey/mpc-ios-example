@@ -7,7 +7,6 @@ import SwiftUI
 import tkey_pkg
 import TorusUtils
 import tss_client_swift
-import web3
 
 func helperTssClient(threshold_key: ThresholdKey, factorKey: String, verifier: String, verifierId: String, tssEndpoints: [String], nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws -> (TSSClient, [String: String]) {
     let selected_tag = try TssModule.get_tss_tag(threshold_key: threshold_key)
