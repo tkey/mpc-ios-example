@@ -7,41 +7,8 @@ import SwiftUI
 import tkey_pkg
 import TorusUtils
 import tss_client_swift
-
-func helperTssClient(threshold_key: ThresholdKey, factorKey: String, verifier: String, verifierId: String, tssEndpoints: [String], nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws -> (TSSClient, [String: String]) {
-    let selected_tag = try TssModule.get_tss_tag(threshold_key: threshold_key)
-    let (tssIndex, tssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: factorKey)
-    let tssNonce = try TssModule.get_tss_nonce(threshold_key: threshold_key, tss_tag: selected_tag)
-
-    // generate a random nonce for sessionID
-    let randomKey = BigUInt(tss_client_swift.SECP256K1.generatePrivateKey()!)
-    let random = BigInt(sign: .plus, magnitude: randomKey) + BigInt(Date().timeIntervalSince1970)
-    let sessionNonce = TSSHelpers.hashMessage(message: String(random))
-    // create the full session string
-    let session = TSSHelpers.assembleFullSession(verifier: verifier, verifierId: verifierId, tssTag: selected_tag, tssNonce: String(tssNonce), sessionNonce: sessionNonce)
-    let tssPublicAddressInfo = try await TssModule.get_dkg_pub_key(threshold_key: threshold_key, tssTag: selected_tag, nonce: String(tssNonce), nodeDetails: nodeDetails, torusUtils: torusUtils)
-    let nodeIndexes = tssPublicAddressInfo.nodeIndexes
-    let userTssIndex = BigInt(tssIndex, radix: 16)!
-    // total parties, including the client
-    let parties = 4
-    // index of the client, last index of partiesIndexes
-    let clientIndex = Int32(parties - 1)
-
-    let (urls, socketUrls, partyIndexes, nodeInd) = try TSSHelpers.generateEndpoints(parties: parties, clientIndex: Int(clientIndex), nodeIndexes: nodeIndexes, urls: tssEndpoints)
-
-    let coeffs = try TSSHelpers.getServerCoefficients(participatingServerDKGIndexes: nodeInd.map({ BigInt($0) }), userTssIndex: userTssIndex)
-
-    let shareUnsigned = BigUInt(tssShare, radix: 16)!
-    let share = BigInt(sign: .plus, magnitude: shareUnsigned)
-
-    let publicKey = try await TssModule.get_tss_pub_key(threshold_key: threshold_key, tss_tag: selected_tag)
-    let keypoint = try KeyPoint(address: publicKey)
-    let fullAddress = try "04" + keypoint.getX() + keypoint.getY()
-
-    let client = try TSSClient(session: session, index: Int32(clientIndex), parties: partyIndexes.map({ Int32($0) }), endpoints: urls.map({ URL(string: $0 ?? "") }), tssSocketEndpoints: socketUrls.map({ URL(string: $0 ?? "") }), share: TSSHelpers.base64Share(share: share), pubKey: try TSSHelpers.base64PublicKey(pubKey: Data(hex: fullAddress)))
-
-    return (client, coeffs)
-}
+import Web3SwiftMpcProvider
+import web3
 
 struct TssView: View {
     @Binding var threshold_key: ThresholdKey!
@@ -137,7 +104,6 @@ struct TssView: View {
 //        }
 
 //        let tss_tags = try! threshold_key.get_all_tss_tags()
-        
 
 //        if !tss_tags.isEmpty {
 //            Section(header: Text("TSS Tag")) {
@@ -337,55 +303,29 @@ struct TssView: View {
 
                         let factorKey = try KeychainInterface.fetch(key: metadataPublicKey + ":" + selected_tag + ":0")
                         // Create tss Client using helper
-                        let (client, coeffs) = try await helperTssClient(threshold_key: threshold_key, factorKey: factorKey, verifier: verifier, verifierId: verifierId, tssEndpoints: tssEndpoints, nodeDetails: nodeDetails!, torusUtils: torusUtils!)
-
-                        // wait for sockets to connect
-                        let connected = try client.checkConnected()
-                        if !connected {
-                            throw RuntimeError("client is not connected")
-                        }
-
-                        // Create a precompute, each server also creates a precompute.
-                        // This calls setup() followed by precompute() for all parties
-                        // If meesages cannot be exchanged by all parties, between all parties, this will fail, since it will timeout waiting for socket messages.
-                        // This will also fail if a single failure notification is received.
-                        // ~puid_seed is the first message set exchanged, ~checkpt123_raw is the last message set exchanged.
-                        // Once ~checkpt123_raw is received, precompute_complete notifications should be received shortly thereafter.
-                        let precompute = try client.precompute(serverCoeffs: coeffs, signatures: sigs)
-
-                        let ready = try client.isReady()
-                        
-                        if !ready {
-                            throw RuntimeError("client is not ready")
-                        }
-
-                        // hash a message
-                        let msg = "hello world"
-                        let msgHash = TSSHelpers.hashMessage(message: msg)
-
-                        // signs a hashed message, collecting signature fragments from the servers
-                        // this function signs locally to produce its' own fragment
-                        // this is combined with the server fragments
-                        // local_verify is then used with the client precompute to produce a full signature and return the components
-                        let (s, r, v) = try client.sign(message: msgHash, hashOnly: true, original_message: msg, precompute: precompute, signatures: sigs)
-
-                        // cleanup sockets
-                        try client.cleanup(signatures: sigs)
 
                         // verify the signature
                         let publicKey = try await TssModule.get_tss_pub_key(threshold_key: threshold_key, tss_tag: selected_tag)
+                        let (tssIndex, tssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: factorKey)
+                        let tssNonce = try TssModule.get_tss_nonce(threshold_key: threshold_key, tss_tag: selected_tag)
+
                         let keypoint = try KeyPoint(address: publicKey)
                         let fullAddress = try "04" + keypoint.getX() + keypoint.getY()
 
-                        if TSSHelpers.verifySignature(msgHash: msgHash, s: s, r: r, v: v, pubKey: Data(hex: fullAddress)) {
-                            let sigHex = try TSSHelpers.hexSignature(s: s, r: r, v: v)
-                            alertContent = "Signature: " + sigHex
-                            showAlert = true
-                            print(try TSSHelpers.hexSignature(s: s, r: r, v: v))
-                        } else {
-                            alertContent = "Signature could not be verified"
-                            showAlert = true
-                        }
+                        let account = try EthereumTssAccount(evmAddress: fullAddress, pubkey: fullAddress, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: [], tssEndpoints: tssEndpoints, authSigs: sigs)
+
+                        let msg = "hello world"
+                        let signature = try account.sign(message: msg)
+
+//                        if TSSHelpers.verifySignature(msgHash: msgHash, s: s, r: r, v: v, pubKey: Data(hex: fullAddress)) {
+//                           let sigHex = try TSSHelpers.hexSignature(s: s, r: r, v: v)
+//                           alertContent = "Signature: " + sigHex
+//                           showAlert = true
+//                           print(try TSSHelpers.hexSignature(s: s, r: r, v: v))
+//                        } else {
+//                           alertContent = "Signature could not be verified"
+//                           showAlert = true
+//                        }
                     } catch {
                         alertContent = "Signing could not be completed. please try again"
                         showAlert = true
@@ -393,6 +333,69 @@ struct TssView: View {
                     showSpinner = false
                 }
             }) { Text("Sign Message") }
+                .disabled( !signingData )
+                .disabled(showSpinner )
+                .opacity(showSpinner ? 0.5 : 1)
+
+        }
+        HStack {
+            if showSpinner {
+                LoaderView()
+            }
+            Button(action: {
+                Task {
+                    do {
+                        let selected_tag = try TssModule.get_tss_tag(threshold_key: threshold_key)
+
+                        let factorKey = try KeychainInterface.fetch(key: metadataPublicKey + ":" + selected_tag + ":0")
+
+                        let (tssIndex, tssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: factorKey)
+
+                        let tssNonce = try TssModule.get_tss_nonce(threshold_key: threshold_key, tss_tag: selected_tag)
+
+                        let tssPublicAddressInfo = try await TssModule.get_dkg_pub_key(threshold_key: threshold_key, tssTag: selected_tag, nonce: String(tssNonce), nodeDetails: nodeDetails!, torusUtils: torusUtils!)
+
+                        let finalPubKey = try await TssModule.get_tss_pub_key(threshold_key: threshold_key, tss_tag: selected_tag)
+
+                        let tssPubKeyPoint = try KeyPoint(address: finalPubKey)
+                        let fullTssPubKey = try tssPubKeyPoint.getPublicKey(format: PublicKeyEncoding.FullAddress)
+
+                        let evmAddress = KeyUtil.generateAddress(from: Data(hex: fullTssPubKey).suffix(64) )
+                        print(evmAddress.toChecksumAddress())
+
+                        // step 2. getting signature
+                        let sigs: [String] = try signatures.map { String(decoding: try JSONSerialization.data(withJSONObject: $0), as: UTF8.self) }
+
+                        let tssAccount = try EthereumTssAccount(evmAddress: evmAddress.toChecksumAddress(), pubkey: fullTssPubKey, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: tssPublicAddressInfo.nodeIndexes, tssEndpoints: tssEndpoints, authSigs: sigs)
+
+                        let RPC_URL = "https://api.avax-test.network/ext/bc/C/rpc"
+                        let chainID = 43113
+                        //                    let RPC_URL = "https://rpc.ankr.com/eth_goerli"
+                        //                    let chainID = 5
+                        let web3Client = EthereumHttpClient(url: URL(string: RPC_URL)!)
+
+                        let amount = 0.001
+                        let toAddress = tssAccount.address
+                        let fromAddress = tssAccount.address
+                        let gasPrice = try await web3Client.eth_gasPrice()
+                        let maxTipInGwie = BigUInt(toEther(Gwie: BigUInt(amount)))
+                        let totalGas = gasPrice + maxTipInGwie
+                        let gasLimit = BigUInt(21000)
+
+                        let amtInGwie = TorusWeb3Utils.toWei(ether: amount)
+                        let nonce = try await web3Client.eth_getTransactionCount(address: fromAddress, block: .Latest)
+                        let transaction = EthereumTransaction(from: fromAddress, to: toAddress, value: amtInGwie, data: Data(), nonce: nonce + 1, gasPrice: totalGas, gasLimit: gasLimit, chainId: chainID)
+                        // let signed = try tssAccount.sign(transaction: transaction)
+                        let val = try await web3Client.eth_sendRawTransaction(transaction, withAccount: tssAccount)
+                        alertContent = "transaction sent"
+                        // alertContent = "transaction signature: " + //(signed.hash?.toHexString() ?? "")
+                        showAlert = true
+                    } catch {
+                        alertContent = "Signing could not be completed. please try again"
+                        showAlert = true
+                    }
+                }
+            }) { Text("transaction signing: send eth") }
                 .disabled( !signingData )
                 .disabled(showSpinner )
                 .opacity(showSpinner ? 0.5 : 1)
