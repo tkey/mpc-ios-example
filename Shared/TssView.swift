@@ -311,8 +311,10 @@ struct TssView: View {
 
                         let keypoint = try KeyPoint(address: publicKey)
                         let fullAddress = try "04" + keypoint.getX() + keypoint.getY()
+                        
+                        let params = EthTssAccountParams(publicKey: fullAddress, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: [], tssEndpoints: tssEndpoints, authSigs: sigs)
 
-                        let account = try EthereumTssAccount(evmAddress: fullAddress, pubkey: fullAddress, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: [], tssEndpoints: tssEndpoints, authSigs: sigs)
+                        let account = try EthereumTssAccount(params: params)
 
                         let msg = "hello world"
                         let signature = try account.sign(message: msg)
@@ -366,7 +368,9 @@ struct TssView: View {
                         // step 2. getting signature
                         let sigs: [String] = try signatures.map { String(decoding: try JSONSerialization.data(withJSONObject: $0), as: UTF8.self) }
 
-                        let tssAccount = try EthereumTssAccount(evmAddress: evmAddress.toChecksumAddress(), pubkey: fullTssPubKey, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: tssPublicAddressInfo.nodeIndexes, tssEndpoints: tssEndpoints, authSigs: sigs)
+                        let params = EthTssAccountParams(publicKey: fullTssPubKey, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: tssPublicAddressInfo.nodeIndexes, tssEndpoints: tssEndpoints, authSigs: sigs)
+                        
+                        let tssAccount = try EthereumTssAccount(params: params)
 
                         let RPC_URL = "https://api.avax-test.network/ext/bc/C/rpc"
                         let chainID = 43113
@@ -378,7 +382,7 @@ struct TssView: View {
                         let toAddress = tssAccount.address
                         let fromAddress = tssAccount.address
                         let gasPrice = try await web3Client.eth_gasPrice()
-                        let maxTipInGwie = BigUInt(toEther(Gwie: BigUInt(amount)))
+                        let maxTipInGwie = BigUInt(TorusWeb3Utils.toEther(gwei: BigUInt(amount)))
                         let totalGas = gasPrice + maxTipInGwie
                         let gasLimit = BigUInt(21000)
 

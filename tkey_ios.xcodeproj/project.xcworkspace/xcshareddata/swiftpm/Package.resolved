@@ -51,7 +51,7 @@
       "location" : "https://github.com/torusresearch/fetch-node-details-swift.git",
       "state" : {
         "branch" : "alpha",
-        "revision" : "46603072d1796e9adc5afe2af33aaceb2294db67"
+        "revision" : "a54d2ea1fb572643324c16b37a4674c705054e73"
       }
     },
     {
@@ -222,7 +222,7 @@
       "location" : "https://github.com/tkey/tkey-mpc-swift",
       "state" : {
         "branch" : "alpha",
-        "revision" : "9f2930b6c24703dca52c7fb19fd56a4755a954a0"
+        "revision" : "cf6fae63427cab2f8637fce371992eaa3353258c"
       }
     },
     {
@@ -249,7 +249,7 @@
       "location" : "https://github.com/tkey/web3-swift-mpc-provider/",
       "state" : {
         "branch" : "feat/tx-signing",
-        "revision" : "d902660d8ede02aab62872b2fff7a982ce37d69c"
+        "revision" : "dd97c789c9384a7184dab3b87ff7c9bb89ea5f3a"
       }
     },
     {
