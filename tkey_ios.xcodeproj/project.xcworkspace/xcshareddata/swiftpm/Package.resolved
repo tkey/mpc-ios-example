@@ -33,7 +33,7 @@
       "location" : "https://github.com/torusresearch/customauth-swift-sdk",
       "state" : {
         "branch" : "alpha",
-        "revision" : "8c3357fbb16f300be0f0abe957c83644f7d007c7"
+        "revision" : "1b2de26121afe912bd8dfd55b78542b5059d4af2"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/torusresearch/fetch-node-details-swift.git",
       "state" : {
-        "branch" : "alpha",
-        "revision" : "46603072d1796e9adc5afe2af33aaceb2294db67"
+        "revision" : "68459eb481c382bfbbe28345b8eb25b3897c7447",
+        "version" : "5.0.0"
       }
     },
     {
@@ -87,16 +87,16 @@
       "location" : "https://github.com/tkey/tkey-mpc-swift",
       "state" : {
         "branch" : "alpha",
-        "revision" : "9f2930b6c24703dca52c7fb19fd56a4755a954a0"
+        "revision" : "cf6fae63427cab2f8637fce371992eaa3353258c"
       }
     },
     {
       "identity" : "torus-utils-swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/torusresearch/torus-utils-swift.git",
+      "location" : "https://github.com/torusresearch/torus-utils-swift",
       "state" : {
         "branch" : "alpha",
-        "revision" : "cc2b7a28beb633c2c534ec0a5ed45a165be221b6"
+        "revision" : "ad0219e01db25a3d9bb0a77757f97db41dd66f78"
       }
     },
     {

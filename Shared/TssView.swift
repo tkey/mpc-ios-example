@@ -211,7 +211,7 @@ struct TssView: View {
 
                                     let mnemonic = try ShareSerializationModule.serialize_share(threshold_key: threshold_key, share: newFactorKey.hex, format: "mnemonic")
                                      // copy to paste board on success generated factor
-                                     UIPasteboard.general.string = mnemonic
+                                     UIPasteboard.general.string = newFactorKey.hex
                                     print(mnemonic)
 
                                     let (newTssIndex, newTssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: newFactorKey.hex)
@@ -268,7 +268,7 @@ struct TssView: View {
 
                                 let mnemonic = try ShareSerializationModule.serialize_share(threshold_key: threshold_key, share: newFactorKey.hex, format: "mnemonic")
                                  // copy to paste board on success generated factor
-                                 UIPasteboard.general.string = mnemonic
+                                 UIPasteboard.general.string = newFactorKey.hex
                                 print(mnemonic)
                                 let (newTssIndex, newTssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: newFactorKey.hex)
                                 updateTag(key: selected_tag)
