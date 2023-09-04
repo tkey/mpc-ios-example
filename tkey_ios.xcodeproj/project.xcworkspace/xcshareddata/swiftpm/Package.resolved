@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/torusresearch/customauth-swift-sdk",
       "state" : {
-        "branch" : "alpha",
-        "revision" : "8c3357fbb16f300be0f0abe957c83644f7d007c7"
+        "revision" : "57bd8dad1ab4b6c320945fdd84d09ea0f6f81486",
+        "version" : "7.0.0"
       }
     },
     {
@@ -50,17 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/torusresearch/fetch-node-details-swift.git",
       "state" : {
-        "branch" : "alpha",
-        "revision" : "a54d2ea1fb572643324c16b37a4674c705054e73"
-      }
-    },
-    {
-      "identity" : "generic-json-swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/iwill/generic-json-swift",
-      "state" : {
-        "revision" : "0a06575f4038b504e78ac330913d920f1630f510",
-        "version" : "2.0.2"
+        "revision" : "68459eb481c382bfbbe28345b8eb25b3897c7447",
+        "version" : "5.0.0"
       }
     },
     {
@@ -228,10 +219,10 @@
     {
       "identity" : "torus-utils-swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/torusresearch/torus-utils-swift.git",
+      "location" : "https://github.com/torusresearch/torus-utils-swift",
       "state" : {
         "branch" : "alpha",
-        "revision" : "cc2b7a28beb633c2c534ec0a5ed45a165be221b6"
+        "revision" : "02707f07324226edee4d26862f743b30a6c1d4a5"
       }
     },
     {

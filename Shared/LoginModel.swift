@@ -1,11 +1,12 @@
 import Foundation
 import CustomAuth
+import TorusUtils
 
 class LoginModel: ObservableObject {
     @Published var loggedIn: Bool = false
     @Published var isLoading = false
     @Published var navigationTitle: String = ""
-    @Published var userData: [String: Any]!
+    @Published var userData: TorusKeyData!
 
     func setup() async {
         await MainActor.run(body: {
@@ -29,7 +30,7 @@ class LoginModel: ObservableObject {
                                          verifier: "google-lrc",
                                          redirectURL: "tdsdk://tdsdk/oauthCallback",
                                          browserRedirectURL: "https://scripts.toruswallet.io/redirect.html")
-            let tdsdk = CustomAuth( aggregateVerifierType: .singleLogin, aggregateVerifier: "google-lrc", subVerifierDetails: [sub], network: .sapphire(.SAPPHIRE_MAINNET), enableOneKey: true)
+            let tdsdk = CustomAuth( aggregateVerifierType: .singleLogin, aggregateVerifier: "google-lrc", subVerifierDetails: [sub], network: .sapphire(.SAPPHIRE_MAINNET), enableOneKey: false)
             let data = try await tdsdk.triggerLogin()
             print(data)
 
