@@ -31,7 +31,7 @@ class LoginModel: ObservableObject {
                                          redirectURL: "tdsdk://tdsdk/oauthCallback",
                                          browserRedirectURL: "https://scripts.toruswallet.io/redirect.html")
             let tdsdk = CustomAuth( aggregateVerifierType: .singleLogin, aggregateVerifier: "google-lrc", subVerifierDetails: [sub], network: .sapphire(.SAPPHIRE_MAINNET), enableOneKey: false)
-            let data = try await tdsdk.triggerLogin(browserType: .asWebAuthSession)
+            let data = try await tdsdk.triggerLogin()
             print(data)
 
             await MainActor.run(body: {

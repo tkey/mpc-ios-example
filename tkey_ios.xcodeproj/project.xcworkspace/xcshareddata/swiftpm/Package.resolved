@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/torusresearch/customauth-swift-sdk",
       "state" : {
-        "branch" : "alpha",
-        "revision" : "1b2de26121afe912bd8dfd55b78542b5059d4af2"
+        "revision" : "57bd8dad1ab4b6c320945fdd84d09ea0f6f81486",
+        "version" : "7.0.0"
       }
     },
     {
@@ -96,7 +96,7 @@
       "location" : "https://github.com/torusresearch/torus-utils-swift",
       "state" : {
         "branch" : "alpha",
-        "revision" : "ad0219e01db25a3d9bb0a77757f97db41dd66f78"
+        "revision" : "02707f07324226edee4d26862f743b30a6c1d4a5"
       }
     },
     {

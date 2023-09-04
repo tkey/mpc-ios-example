@@ -33,12 +33,13 @@ func helperTssClient(threshold_key: ThresholdKey, factorKey: String, verifier: S
 
     let shareUnsigned = BigUInt(tssShare, radix: 16)!
     let share = BigInt(sign: .plus, magnitude: shareUnsigned)
+    let denormalizeShare = try TSSHelpers.denormalizeShare(participatingServerDKGIndexes: nodeInd.map({ BigInt($0) }), userTssIndex: userTssIndex, userTssShare: share)
 
     let publicKey = try await TssModule.get_tss_pub_key(threshold_key: threshold_key, tss_tag: selected_tag)
     let keypoint = try KeyPoint(address: publicKey)
     let fullAddress = try "04" + keypoint.getX() + keypoint.getY()
 
-    let client = try TSSClient(session: session, index: Int32(clientIndex), parties: partyIndexes.map({ Int32($0) }), endpoints: urls.map({ URL(string: $0 ?? "") }), tssSocketEndpoints: socketUrls.map({ URL(string: $0 ?? "") }), share: TSSHelpers.base64Share(share: share), pubKey: try TSSHelpers.base64PublicKey(pubKey: Data(hex: fullAddress)))
+    let client = try TSSClient(session: session, index: Int32(clientIndex), parties: partyIndexes.map({ Int32($0) }), endpoints: urls.map({ URL(string: $0 ?? "") }), tssSocketEndpoints: socketUrls.map({ URL(string: $0 ?? "") }), share: TSSHelpers.base64Share(share: denormalizeShare), pubKey: try TSSHelpers.base64PublicKey(pubKey: Data(hex: fullAddress)))
 
     return (client, coeffs)
 }
@@ -98,6 +99,7 @@ struct TssView: View {
             updateTag(key: "default")
         }
 
+        /// Section on example of using different tagged tss key
 //        Section(header: Text("Tss Module")) {
 //            HStack {
 //                Button(action: {
@@ -211,8 +213,7 @@ struct TssView: View {
 
                                     let mnemonic = try ShareSerializationModule.serialize_share(threshold_key: threshold_key, share: newFactorKey.hex, format: "mnemonic")
                                      // copy to paste board on success generated factor
-                                     UIPasteboard.general.string = mnemonic
-                                    print(mnemonic)
+                                    UIPasteboard.general.string = mnemonic
 
                                     let (newTssIndex, newTssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: newFactorKey.hex)
                                     updateTag(key: selected_tag)
@@ -267,9 +268,10 @@ struct TssView: View {
                                 try await threshold_key.add_share_description(key: newFactorPub, description: jsonStr)
 
                                 let mnemonic = try ShareSerializationModule.serialize_share(threshold_key: threshold_key, share: newFactorKey.hex, format: "mnemonic")
-                                 // copy to paste board on success generated factor
-                                 UIPasteboard.general.string = mnemonic
-                                print(mnemonic)
+                                
+                                // copy to paste board on success generated factor
+                                UIPasteboard.general.string = mnemonic
+                                
                                 let (newTssIndex, newTssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: newFactorKey.hex)
                                 updateTag(key: selected_tag)
                                 alertContent = "tssIndex:" + newTssIndex + "\n" + "tssShare:" + newTssShare + "\n" + "newFactorKey" + newFactorKey.hex  + mnemonic
