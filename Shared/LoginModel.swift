@@ -1,11 +1,12 @@
 import Foundation
 import CustomAuth
+import TorusUtils
 
 class LoginModel: ObservableObject {
     @Published var loggedIn: Bool = false
     @Published var isLoading = false
     @Published var navigationTitle: String = ""
-    @Published var userData: [String: Any]!
+    @Published var userData: TorusKeyData!
 
     func setup() async {
         await MainActor.run(body: {
