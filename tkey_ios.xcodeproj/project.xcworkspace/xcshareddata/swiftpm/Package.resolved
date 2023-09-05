@@ -185,8 +185,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tkey/web3-swift-mpc-provider/",
       "state" : {
-        "branch" : "feat/tx-signing",
-        "revision" : "75247e8a6393b97c464aec4a3b223a5576ffc5b7"
+        "revision" : "206ae41face7590b8642703005d768c633015d75",
+        "version" : "1.0.0"
       }
     },
     {
