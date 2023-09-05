@@ -35,6 +35,7 @@
 		F00423A32A8B64D600F11B11 /* helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00423A12A8B64D600F11B11 /* helper.swift */; };
 		F07B88132A988F4F00275879 /* RecoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F07B88122A988F4F00275879 /* RecoveryView.swift */; };
 		F07B88142A988F4F00275879 /* RecoveryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F07B88122A988F4F00275879 /* RecoveryView.swift */; };
+		F0B2A2282A9758C000DA2F79 /* Web3SwiftMpcProvider in Frameworks */ = {isa = PBXBuildFile; productRef = F0B2A2272A9758C000DA2F79 /* Web3SwiftMpcProvider */; };
 		F0E2AC442A73A3C900F6C17A /* TssView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0E2AC432A73A3C900F6C17A /* TssView.swift */; };
 		F0E2AC452A73A3C900F6C17A /* TssView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0E2AC432A73A3C900F6C17A /* TssView.swift */; };
 /* End PBXBuildFile section */
@@ -98,6 +99,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				146B0D6929CC01F7000473A8 /* CustomAuth in Frameworks */,
+				F0B2A2282A9758C000DA2F79 /* Web3SwiftMpcProvider in Frameworks */,
 				B3B8BF5D2A73C66B007B6170 /* tss-client-swift in Frameworks */,
 				14A112C62A94F312002E22D4 /* ThresholdKey in Frameworks */,
 			);
@@ -222,6 +224,7 @@
 				146B0D6829CC01F7000473A8 /* CustomAuth */,
 				B3B8BF5C2A73C66B007B6170 /* tss-client-swift */,
 				14A112C52A94F312002E22D4 /* ThresholdKey */,
+				F0B2A2272A9758C000DA2F79 /* Web3SwiftMpcProvider */,
 			);
 			productName = "tkey_ios (iOS)";
 			productReference = B30B6B1728BCC8AC00812C1E /* tkey_ios.app */;
@@ -325,6 +328,7 @@
 				146B0D6729CC01F7000473A8 /* XCRemoteSwiftPackageReference "customauth-swift-sdk" */,
 				B3B8BF5B2A73C66B007B6170 /* XCRemoteSwiftPackageReference "tss-client-swift" */,
 				14A112C42A94F312002E22D4 /* XCRemoteSwiftPackageReference "tkey-mpc-swift" */,
+				F0B2A2262A9758C000DA2F79 /* XCRemoteSwiftPackageReference "web3-swift-mpc-provider" */,
 			);
 			productRefGroup = B30B6B1828BCC8AC00812C1E /* Products */;
 			projectDirPath = "";
@@ -912,6 +916,14 @@
 				minimumVersion = 1.0.10;
 			};
 		};
+		F0B2A2262A9758C000DA2F79 /* XCRemoteSwiftPackageReference "web3-swift-mpc-provider" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tkey/web3-swift-mpc-provider/";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -929,6 +941,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B3B8BF5B2A73C66B007B6170 /* XCRemoteSwiftPackageReference "tss-client-swift" */;
 			productName = "tss-client-swift";
+		};
+		F0B2A2272A9758C000DA2F79 /* Web3SwiftMpcProvider */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F0B2A2262A9758C000DA2F79 /* XCRemoteSwiftPackageReference "web3-swift-mpc-provider" */;
+			productName = Web3SwiftMpcProvider;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

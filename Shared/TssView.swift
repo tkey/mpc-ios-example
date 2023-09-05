@@ -7,42 +7,8 @@ import SwiftUI
 import tkey_pkg
 import TorusUtils
 import tss_client_swift
-
-func helperTssClient(threshold_key: ThresholdKey, factorKey: String, verifier: String, verifierId: String, tssEndpoints: [String], nodeDetails: AllNodeDetailsModel, torusUtils: TorusUtils) async throws -> (TSSClient, [String: String]) {
-    let selected_tag = try TssModule.get_tss_tag(threshold_key: threshold_key)
-    let (tssIndex, tssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: factorKey)
-    let tssNonce = try TssModule.get_tss_nonce(threshold_key: threshold_key, tss_tag: selected_tag)
-
-    // generate a random nonce for sessionID
-    let randomKey = BigUInt(tss_client_swift.SECP256K1.generatePrivateKey()!)
-    let random = BigInt(sign: .plus, magnitude: randomKey) + BigInt(Date().timeIntervalSince1970)
-    let sessionNonce = TSSHelpers.hashMessage(message: String(random))
-    // create the full session string
-    let session = TSSHelpers.assembleFullSession(verifier: verifier, verifierId: verifierId, tssTag: selected_tag, tssNonce: String(tssNonce), sessionNonce: sessionNonce)
-    let tssPublicAddressInfo = try await TssModule.get_dkg_pub_key(threshold_key: threshold_key, tssTag: selected_tag, nonce: String(tssNonce), nodeDetails: nodeDetails, torusUtils: torusUtils)
-    let nodeIndexes = tssPublicAddressInfo.nodeIndexes
-    let userTssIndex = BigInt(tssIndex, radix: 16)!
-    // total parties, including the client
-    let parties = 4
-    // index of the client, last index of partiesIndexes
-    let clientIndex = Int32(parties - 1)
-
-    let (urls, socketUrls, partyIndexes, nodeInd) = try TSSHelpers.generateEndpoints(parties: parties, clientIndex: Int(clientIndex), nodeIndexes: nodeIndexes, urls: tssEndpoints)
-
-    let coeffs = try TSSHelpers.getServerCoefficients(participatingServerDKGIndexes: nodeInd.map({ BigInt($0) }), userTssIndex: userTssIndex)
-
-    let shareUnsigned = BigUInt(tssShare, radix: 16)!
-    let share = BigInt(sign: .plus, magnitude: shareUnsigned)
-    let denormalizeShare = try TSSHelpers.denormalizeShare(participatingServerDKGIndexes: nodeInd.map({ BigInt($0) }), userTssIndex: userTssIndex, userTssShare: share)
-
-    let publicKey = try await TssModule.get_tss_pub_key(threshold_key: threshold_key, tss_tag: selected_tag)
-    let keypoint = try KeyPoint(address: publicKey)
-    let fullAddress = try "04" + keypoint.getX() + keypoint.getY()
-
-    let client = try TSSClient(session: session, index: Int32(clientIndex), parties: partyIndexes.map({ Int32($0) }), endpoints: urls.map({ URL(string: $0 ?? "") }), tssSocketEndpoints: socketUrls.map({ URL(string: $0 ?? "") }), share: TSSHelpers.base64Share(share: denormalizeShare), pubKey: try TSSHelpers.base64PublicKey(pubKey: Data(hex: fullAddress)))
-
-    return (client, coeffs)
-}
+import Web3SwiftMpcProvider
+import web3
 
 struct TssView: View {
     @Binding var threshold_key: ThresholdKey!
@@ -179,85 +145,28 @@ struct TssView: View {
                     }
                     Button(action: {
 
-                            Task {
-                                do {
-                                    showSpinner = true
-                                    // generate factor key if input is empty
-                                    // derive factor pub
-                                    let newFactorKey = try PrivateKey.generate()
-                                    let newFactorPub = try newFactorKey.toPublic()
-
-                                    // use exising factor to generate tss share with index 3 with new factor
-                                    let factorKey = try KeychainInterface.fetch(key: selectedFactorPub)
-
-                                    let shareIndex = try await TssModule.find_device_share_index(threshold_key: threshold_key, factor_key: factorKey)
-                                    try TssModule.backup_share_with_factor_key(threshold_key: threshold_key, shareIndex: shareIndex, factorKey: newFactorKey.hex)
-
-                                    // for now only tss index 2 and index 3 are supported
-                                    let tssShareIndex = Int32(3)
-                                    let sigs: [String] = try signatures.map { String(decoding: try JSONSerialization.data(withJSONObject: $0), as: UTF8.self) }
-                                    try await TssModule.add_factor_pub(threshold_key: threshold_key, tss_tag: selected_tag, factor_key: factorKey, auth_signatures: sigs, new_factor_pub: newFactorPub, new_tss_index: tssShareIndex, nodeDetails: nodeDetails!, torusUtils: torusUtils!)
-
-                                    let saveNewFactorId = newFactorPub
-                                    try KeychainInterface.save(item: newFactorKey.hex, key: saveNewFactorId)
-
-                                    let description = [
-                                        "module": "Manual Backup",
-                                        "tssTag": selected_tag,
-                                        "tssShareIndex": tssShareIndex,
-                                        "dateAdded": Date().timeIntervalSince1970
-                                    ] as [String: Codable]
-                                    let jsonStr = try factorDescription(dataObj: description)
-                                    try await threshold_key.add_share_description(key: newFactorPub, description: jsonStr)
-                                    // show factor key used
-
-                                    let mnemonic = try ShareSerializationModule.serialize_share(threshold_key: threshold_key, share: newFactorKey.hex, format: "mnemonic")
-                                     // copy to paste board on success generated factor
-                                    UIPasteboard.general.string = mnemonic
-
-                                    let (newTssIndex, newTssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: newFactorKey.hex)
-                                    updateTag(key: selected_tag)
-                                    alertContent = "tssIndex:" + newTssIndex + "\n" + "tssShare:" + newTssShare + "\n" + "newFactorKey" + newFactorKey.hex  + mnemonic
-                                    showAlert = true
-                                    showSpinner = false
-                                } catch {
-                                    alertContent = "Invalid Factor Key"
-                                    showAlert = true
-                                    showSpinner = false
-                                }
-                            }
-                    }) { Text("Create New TSSShare Into Manual Backup Factor") }
-                }.alert(isPresented: $showAlert) {
-                    Alert(title: Text("Alert"), message: Text(alertContent), dismissButton: .default(Text("Ok")))
-                }.disabled(showSpinner )
-                .opacity(showSpinner ? 0.5 : 1)
-
-                HStack {
-                    if showSpinner {
-                        LoaderView()
-                    }
-                    Button(action: {
-                            Task {
+                        Task {
+                            do {
                                 showSpinner = true
                                 // generate factor key if input is empty
                                 // derive factor pub
                                 let newFactorKey = try PrivateKey.generate()
-                                let newFactorPub = try convertPublicKeyFormat(publicKey: newFactorKey.toPublic(), outFormat: .EllipticCompress)
+                                let newFactorPub = try newFactorKey.toPublic()
 
-                                // get existing factor key
+                                // use exising factor to generate tss share with index 3 with new factor
                                 let factorKey = try KeychainInterface.fetch(key: selectedFactorPub)
 
                                 let shareIndex = try await TssModule.find_device_share_index(threshold_key: threshold_key, factor_key: factorKey)
                                 try TssModule.backup_share_with_factor_key(threshold_key: threshold_key, shareIndex: shareIndex, factorKey: newFactorKey.hex)
 
-                                let (tssShareIndex, _ ) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: factorKey)
-
-                                // tssShareIndex provided will be cross checked with factorKey to prevent wrong tss share copied
-                                try await TssModule.copy_factor_pub(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: factorKey, newFactorPub: newFactorPub, tss_index: Int32(tssShareIndex)!)
+                                // for now only tss index 2 and index 3 are supported
+                                let tssShareIndex = Int32(3)
+                                let sigs: [String] = try signatures.map { String(decoding: try JSONSerialization.data(withJSONObject: $0), as: UTF8.self) }
+                                try await TssModule.add_factor_pub(threshold_key: threshold_key, tss_tag: selected_tag, factor_key: factorKey, auth_signatures: sigs, new_factor_pub: newFactorPub, new_tss_index: tssShareIndex, nodeDetails: nodeDetails!, torusUtils: torusUtils!)
 
                                 let saveNewFactorId = newFactorPub
                                 try KeychainInterface.save(item: newFactorKey.hex, key: saveNewFactorId)
-                                // show factor key used
+
                                 let description = [
                                     "module": "Manual Backup",
                                     "tssTag": selected_tag,
@@ -266,23 +175,80 @@ struct TssView: View {
                                 ] as [String: Codable]
                                 let jsonStr = try factorDescription(dataObj: description)
                                 try await threshold_key.add_share_description(key: newFactorPub, description: jsonStr)
+                                // show factor key used
 
                                 let mnemonic = try ShareSerializationModule.serialize_share(threshold_key: threshold_key, share: newFactorKey.hex, format: "mnemonic")
-                                
                                 // copy to paste board on success generated factor
                                 UIPasteboard.general.string = mnemonic
-                                
+
                                 let (newTssIndex, newTssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: newFactorKey.hex)
                                 updateTag(key: selected_tag)
                                 alertContent = "tssIndex:" + newTssIndex + "\n" + "tssShare:" + newTssShare + "\n" + "newFactorKey" + newFactorKey.hex  + mnemonic
                                 showAlert = true
                                 showSpinner = false
+                            } catch {
+                                alertContent = "Invalid Factor Key"
+                                showAlert = true
+                                showSpinner = false
                             }
+                        }
+                    }) { Text("Create New TSSShare Into Manual Backup Factor") }
+                }.alert(isPresented: $showAlert) {
+                    Alert(title: Text("Alert"), message: Text(alertContent), dismissButton: .default(Text("Ok")))
+                }.disabled(showSpinner )
+                    .opacity(showSpinner ? 0.5 : 1)
+
+                HStack {
+                    if showSpinner {
+                        LoaderView()
+                    }
+                    Button(action: {
+                        Task {
+                            showSpinner = true
+                            // generate factor key if input is empty
+                            // derive factor pub
+                            let newFactorKey = try PrivateKey.generate()
+                            let newFactorPub = try convertPublicKeyFormat(publicKey: newFactorKey.toPublic(), outFormat: .EllipticCompress)
+
+                            // get existing factor key
+                            let factorKey = try KeychainInterface.fetch(key: selectedFactorPub)
+
+                            let shareIndex = try await TssModule.find_device_share_index(threshold_key: threshold_key, factor_key: factorKey)
+                            try TssModule.backup_share_with_factor_key(threshold_key: threshold_key, shareIndex: shareIndex, factorKey: newFactorKey.hex)
+
+                            let (tssShareIndex, _ ) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: factorKey)
+
+                            // tssShareIndex provided will be cross checked with factorKey to prevent wrong tss share copied
+                            try await TssModule.copy_factor_pub(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: factorKey, newFactorPub: newFactorPub, tss_index: Int32(tssShareIndex)!)
+
+                            let saveNewFactorId = newFactorPub
+                            try KeychainInterface.save(item: newFactorKey.hex, key: saveNewFactorId)
+                            // show factor key used
+                            let description = [
+                                "module": "Manual Backup",
+                                "tssTag": selected_tag,
+                                "tssShareIndex": tssShareIndex,
+                                "dateAdded": Date().timeIntervalSince1970
+                            ] as [String: Codable]
+                            let jsonStr = try factorDescription(dataObj: description)
+                            try await threshold_key.add_share_description(key: newFactorPub, description: jsonStr)
+
+                            let mnemonic = try ShareSerializationModule.serialize_share(threshold_key: threshold_key, share: newFactorKey.hex, format: "mnemonic")
+
+                            // copy to paste board on success generated factor
+                            UIPasteboard.general.string = mnemonic
+
+                            let (newTssIndex, newTssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: newFactorKey.hex)
+                            updateTag(key: selected_tag)
+                            alertContent = "tssIndex:" + newTssIndex + "\n" + "tssShare:" + newTssShare + "\n" + "newFactorKey" + newFactorKey.hex  + mnemonic
+                            showAlert = true
+                            showSpinner = false
+                        }
                     }) { Text("Copy Existing TSS Share For New Factor Manual") }
                 }.alert(isPresented: $showAlert) {
                     Alert(title: Text("Alert"), message: Text(alertContent), dismissButton: .default(Text("Ok")))
                 }.disabled(showSpinner )
-                 .opacity(showSpinner ? 0.5 : 1)
+                    .opacity(showSpinner ? 0.5 : 1)
 
                 HStack {
                     if showSpinner {
@@ -394,56 +360,37 @@ struct TssView: View {
                         do {
                             let sigs: [String] = try signatures.map { String(decoding: try JSONSerialization.data(withJSONObject: $0), as: UTF8.self) }
                             // get the factor key information
+
                             let factorKey = try KeychainInterface.fetch(key: selectedFactorPub)
                             // Create tss Client using helper
-                            let (client, coeffs) = try await helperTssClient(threshold_key: threshold_key, factorKey: factorKey, verifier: verifier, verifierId: verifierId, tssEndpoints: tssEndpoints, nodeDetails: nodeDetails!, torusUtils: torusUtils!)
-
-                            // wait for sockets to connect
-                            let connected = try client.checkConnected()
-                            if !connected {
-                                throw RuntimeError("client is not connected")
-                            }
-
-                            // Create a precompute, each server also creates a precompute.
-                            // This calls setup() followed by precompute() for all parties
-                            // If meesages cannot be exchanged by all parties, between all parties, this will fail, since it will timeout waiting for socket messages.
-                            // This will also fail if a single failure notification is received.
-                            // ~puid_seed is the first message set exchanged, ~checkpt123_raw is the last message set exchanged.
-                            // Once ~checkpt123_raw is received, precompute_complete notifications should be received shortly thereafter.
-                            let precompute = try client.precompute(serverCoeffs: coeffs, signatures: sigs)
-
-                            let ready = try client.isReady()
-
-                            if !ready {
-                                throw RuntimeError("client is not ready")
-                            }
-
-                            // hash a message
-                            let msg = "hello world"
-                            let msgHash = TSSHelpers.hashMessage(message: msg)
-
-                            // signs a hashed message, collecting signature fragments from the servers
-                            // this function signs locally to produce its' own fragment
-                            // this is combined with the server fragments
-                            // local_verify is then used with the client precompute to produce a full signature and return the components
-                            let (s, r, v) = try client.sign(message: msgHash, hashOnly: true, original_message: msg, precompute: precompute, signatures: sigs)
-
-                            // cleanup sockets
-                            try client.cleanup(signatures: sigs)
 
                             // verify the signature
                             let publicKey = try await TssModule.get_tss_pub_key(threshold_key: threshold_key, tss_tag: selected_tag)
+                            let (tssIndex, tssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: factorKey)
+                            let tssNonce = try TssModule.get_tss_nonce(threshold_key: threshold_key, tss_tag: selected_tag)
+
                             let keypoint = try KeyPoint(address: publicKey)
                             let fullAddress = try "04" + keypoint.getX() + keypoint.getY()
 
+                            let params = EthTssAccountParams(publicKey: fullAddress, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: [], tssEndpoints: tssEndpoints, authSigs: sigs)
+
+                            let account = EthereumTssAccount(params: params)
+
+                            let msg = "hello world"
+                            let signature = try account.sign(message: msg)
+                            let r = BigInt( sign: .plus, magnitude: BigUInt(signature.prefix(32)))
+                            let s = BigInt( sign: .plus, magnitude: BigUInt(signature.prefix(64).suffix(32)))
+                            let v = UInt8(signature.suffix(1).toHexString(), radix: 16 )!
+
+                            let msgHash = TSSHelpers.hashMessage(message: msg)
                             if TSSHelpers.verifySignature(msgHash: msgHash, s: s, r: r, v: v, pubKey: Data(hex: fullAddress)) {
-                                let sigHex = try TSSHelpers.hexSignature(s: s, r: r, v: v)
-                                alertContent = "Signature: " + sigHex
-                                showAlert = true
-                                print(try TSSHelpers.hexSignature(s: s, r: r, v: v))
+                               let sigHex = try TSSHelpers.hexSignature(s: s, r: r, v: v)
+                               alertContent = "Signature: " + sigHex
+                               showAlert = true
+                               print(try TSSHelpers.hexSignature(s: s, r: r, v: v))
                             } else {
-                                alertContent = "Signature could not be verified"
-                                showAlert = true
+                               alertContent = "Signature could not be verified"
+                               showAlert = true
                             }
                         } catch {
                             alertContent = "Signing could not be completed. please try again"
@@ -452,6 +399,69 @@ struct TssView: View {
                         showSpinner = false
                     }
                 }) { Text("Sign Message") }
+                    .disabled( !signingData )
+                    .disabled(showSpinner )
+                    .opacity(showSpinner ? 0.5 : 1)
+
+            }
+            HStack {
+                if showSpinner {
+                    LoaderView()
+                }
+                Button(action: {
+                    Task {
+                        do {
+                            let selected_tag = try TssModule.get_tss_tag(threshold_key: threshold_key)
+
+                            let factorKey = try KeychainInterface.fetch(key: selectedFactorPub)
+
+                            let (tssIndex, tssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: factorKey)
+
+                            let tssNonce = try TssModule.get_tss_nonce(threshold_key: threshold_key, tss_tag: selected_tag)
+
+                            let tssPublicAddressInfo = try await TssModule.get_dkg_pub_key(threshold_key: threshold_key, tssTag: selected_tag, nonce: String(tssNonce), nodeDetails: nodeDetails!, torusUtils: torusUtils!)
+
+                            let finalPubKey = try await TssModule.get_tss_pub_key(threshold_key: threshold_key, tss_tag: selected_tag)
+
+                            let tssPubKeyPoint = try KeyPoint(address: finalPubKey)
+                            let fullTssPubKey = try tssPubKeyPoint.getPublicKey(format: PublicKeyEncoding.FullAddress)
+
+                            let evmAddress = KeyUtil.generateAddress(from: Data(hex: fullTssPubKey).suffix(64) )
+                            print(evmAddress.toChecksumAddress())
+
+                            // step 2. getting signature
+                            let sigs: [String] = try signatures.map { String(decoding: try JSONSerialization.data(withJSONObject: $0), as: UTF8.self) }
+
+                            let params = EthTssAccountParams(publicKey: fullTssPubKey, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: tssPublicAddressInfo.nodeIndexes, tssEndpoints: tssEndpoints, authSigs: sigs)
+
+                            let tssAccount = EthereumTssAccount(params: params)
+
+                            let RPC_URL = "https://api.avax-test.network/ext/bc/C/rpc"
+                            let chainID = 43113
+//                            let RPC_URL = "https://rpc.ankr.com/eth_goerli"
+//                            let chainID = 5
+                            let web3Client = EthereumHttpClient(url: URL(string: RPC_URL)!)
+
+                            let amount = 0.001
+                            let toAddress = tssAccount.address
+                            let fromAddress = tssAccount.address
+                            let gasPrice = try await web3Client.eth_gasPrice()
+                            let maxTipInGwie = BigUInt(try TorusWeb3Utils.toEther(gwei: BigUInt(amount)))
+                            let totalGas = gasPrice + maxTipInGwie
+                            let gasLimit = BigUInt(21000)
+
+                            let amtInGwie = TorusWeb3Utils.toWei(ether: amount)
+                            let nonce = try await web3Client.eth_getTransactionCount(address: fromAddress, block: .Latest)
+                            let transaction = EthereumTransaction(from: fromAddress, to: toAddress, value: amtInGwie, data: Data(), nonce: nonce + 1, gasPrice: totalGas, gasLimit: gasLimit, chainId: chainID)
+                            _ = try await web3Client.eth_sendRawTransaction(transaction, withAccount: tssAccount)
+                            alertContent = "transaction sent"
+                            showAlert = true
+                        } catch {
+                            alertContent = "Signing could not be completed. please try again"
+                            showAlert = true
+                        }
+                    }
+                }) { Text("transaction signing: send eth") }
                     .disabled( !signingData )
                     .disabled(showSpinner )
                     .opacity(showSpinner ? 0.5 : 1)

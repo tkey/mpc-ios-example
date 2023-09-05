@@ -249,7 +249,7 @@ struct ThresholdKeyView: View {
                 let allTags = try threshold_key.get_all_tss_tags()
                 print(allTags)
                 let tag = "default" // allTags[0]
-                let fetchId = metadataPublicKey
+                _ = metadataPublicKey
 
                 guard let factorPub = UserDefaults.standard.string(forKey: metadataPublicKey ) else {
                      alertContent = "Failed to find device share."
