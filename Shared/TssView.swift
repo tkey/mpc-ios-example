@@ -377,24 +377,24 @@ struct TssView: View {
                             let account = try EthereumTssAccount(params: params)
 
                             let msg = "hello world"
+                            let msgHash = msg.data(using: .utf8)?.sha3(.keccak256)
                             let signature = try account.sign(message: msg)
                             print(signature)
                             print(signature.toHexString())
-                            let r = signature.prefix(32)
-                            let s = signature.prefix(64).suffix(32)
-                            let v = signature.suffix(2)
-                            
-                            
-//                            BigInt(r)
-//                            if TSSHelpers.verifySignature(msgHash: msgHash, s: s, r: r, v: v, pubKey: Data(hex: fullAddress)) {
-//                               let sigHex = try TSSHelpers.hexSignature(s: s, r: r, v: v)
-//                               alertContent = "Signature: " + sigHex
-//                               showAlert = true
-//                               print(try TSSHelpers.hexSignature(s: s, r: r, v: v))
-//                            } else {
-//                               alertContent = "Signature could not be verified"
-//                               showAlert = true
-//                            }
+                            let r = BigInt( sign: .plus, magnitude: BigUInt(signature.prefix(32)))
+                            let s = BigInt( sign: .plus, magnitude: BigUInt(signature.prefix(64).suffix(32)))
+                            let v = UInt8(signature.suffix(1).toHexString(), radix: 16 )! + 27
+
+                            print(try TSSHelpers.hexSignature(s: s, r: r, v: v))
+                            if TSSHelpers.verifySignature(msgHash: msgHash!.toHexString(), s: s, r: r, v: v, pubKey: Data(hex: fullAddress)) {
+                               let sigHex = try TSSHelpers.hexSignature(s: s, r: r, v: v)
+                               alertContent = "Signature: " + sigHex
+                               showAlert = true
+                               print(try TSSHelpers.hexSignature(s: s, r: r, v: v))
+                            } else {
+                               alertContent = "Signature could not be verified"
+                               showAlert = true
+                            }
                         } catch {
                             alertContent = "Signing could not be completed. please try again"
                             showAlert = true
