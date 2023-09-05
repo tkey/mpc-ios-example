@@ -374,7 +374,7 @@ struct TssView: View {
 
                             let params = EthTssAccountParams(publicKey: fullAddress, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: [], tssEndpoints: tssEndpoints, authSigs: sigs)
 
-                            let account = try EthereumTssAccount(params: params)
+                            let account = EthereumTssAccount(params: params)
 
                             let msg = "hello world"
                             let signature = try account.sign(message: msg)
@@ -434,7 +434,7 @@ struct TssView: View {
 
                             let params = EthTssAccountParams(publicKey: fullTssPubKey, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: tssPublicAddressInfo.nodeIndexes, tssEndpoints: tssEndpoints, authSigs: sigs)
 
-                            let tssAccount = try EthereumTssAccount(params: params)
+                            let tssAccount = EthereumTssAccount(params: params)
 
                             let RPC_URL = "https://api.avax-test.network/ext/bc/C/rpc"
                             let chainID = 43113
@@ -446,14 +446,14 @@ struct TssView: View {
                             let toAddress = tssAccount.address
                             let fromAddress = tssAccount.address
                             let gasPrice = try await web3Client.eth_gasPrice()
-                            let maxTipInGwie = BigUInt(TorusWeb3Utils.toEther(gwei: BigUInt(amount)))
+                            let maxTipInGwie = BigUInt(try TorusWeb3Utils.toEther(gwei: BigUInt(amount)))
                             let totalGas = gasPrice + maxTipInGwie
                             let gasLimit = BigUInt(21000)
 
                             let amtInGwie = TorusWeb3Utils.toWei(ether: amount)
                             let nonce = try await web3Client.eth_getTransactionCount(address: fromAddress, block: .Latest)
                             let transaction = EthereumTransaction(from: fromAddress, to: toAddress, value: amtInGwie, data: Data(), nonce: nonce + 1, gasPrice: totalGas, gasLimit: gasLimit, chainId: chainID)
-                            let val = try await web3Client.eth_sendRawTransaction(transaction, withAccount: tssAccount)
+                            _ = try await web3Client.eth_sendRawTransaction(transaction, withAccount: tssAccount)
                             alertContent = "transaction sent"
                             showAlert = true
                         } catch {
