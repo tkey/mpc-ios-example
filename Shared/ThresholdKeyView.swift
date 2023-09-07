@@ -408,7 +408,7 @@ struct ThresholdKeyView: View {
                                 showTss = true
                             }
                         }) { Text("Signing functions") }
-                    }.disabled( tkeyInitalized != true )
+                    }.disabled( tkeyReconstructed != true )
 
                     Section(header: Text("Basic functionality")) {
                         if !tkeyInitalized {
