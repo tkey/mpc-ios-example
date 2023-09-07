@@ -338,7 +338,8 @@ struct TssView: View {
                             alertContent = "deleted factor key :" + deleteFactorKey
                             showAlert = true
                             showSpinner = false
-                        } catch {
+                            showTss = false
+                            } catch {
                             alertContent = "unable to delete factor. Possible wrong factor key"
                             showAlert = true
                             showSpinner = false
@@ -360,32 +361,35 @@ struct TssView: View {
                     Task {
                         showSpinner = true
                         do {
-                            let sigs: [String] = try signatures.map { String(decoding: try JSONSerialization.data(withJSONObject: $0), as: UTF8.self) }
-                            // get the factor key information
+                            let selected_tag = try TssModule.get_tss_tag(threshold_key: threshold_key)
 
                             let factorKey = try KeychainInterface.fetch(key: selectedFactorPub)
-                            // Create tss Client using helper
 
-                            // verify the signature
-                            let publicKey = try await TssModule.get_tss_pub_key(threshold_key: threshold_key, tss_tag: selected_tag)
                             let (tssIndex, tssShare) = try await TssModule.get_tss_share(threshold_key: threshold_key, tss_tag: selected_tag, factorKey: factorKey)
+
                             let tssNonce = try TssModule.get_tss_nonce(threshold_key: threshold_key, tss_tag: selected_tag)
 
-                            let keypoint = try KeyPoint(address: publicKey)
-                            let fullAddress = try "04" + keypoint.getX() + keypoint.getY()
+                            let tssPublicAddressInfo = try await TssModule.get_dkg_pub_key(threshold_key: threshold_key, tssTag: selected_tag, nonce: String(tssNonce), nodeDetails: nodeDetails!, torusUtils: torusUtils!)
 
-                            let params = EthTssAccountParams(publicKey: fullAddress, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: [], tssEndpoints: tssEndpoints, authSigs: sigs)
+                            let finalPubKey = try await TssModule.get_tss_pub_key(threshold_key: threshold_key, tss_tag: selected_tag)
 
-                            let account = EthereumTssAccount(params: params)
+                            let tssPubKeyPoint = try KeyPoint(address: finalPubKey)
+                            let fullTssPubKey = try tssPubKeyPoint.getPublicKey(format: PublicKeyEncoding.FullAddress)
+
+                            let sigs: [String] = try signatures.map { String(decoding: try JSONSerialization.data(withJSONObject: $0), as: UTF8.self) }
+
+                            let params = EthTssAccountParams(publicKey: fullTssPubKey, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: tssPublicAddressInfo.nodeIndexes, tssEndpoints: tssEndpoints, authSigs: sigs)
+
+                            let tssAccount = EthereumTssAccount(params: params)
 
                             let msg = "hello world"
-                            let signature = try account.sign(message: msg)
+                            let signature = try tssAccount.sign(message: msg)
                             let r = BigInt( sign: .plus, magnitude: BigUInt(signature.prefix(32)))
                             let s = BigInt( sign: .plus, magnitude: BigUInt(signature.prefix(64).suffix(32)))
                             let v = UInt8(signature.suffix(1).toHexString(), radix: 16 )!
 
                             let msgHash = TSSHelpers.hashMessage(message: msg)
-                            if TSSHelpers.verifySignature(msgHash: msgHash, s: s, r: r, v: v, pubKey: Data(hex: fullAddress)) {
+                            if TSSHelpers.verifySignature(msgHash: msgHash, s: s, r: r, v: v, pubKey: Data(hex: fullTssPubKey)) {
                                let sigHex = try TSSHelpers.hexSignature(s: s, r: r, v: v)
                                alertContent = "Signature: " + sigHex
                                showAlert = true
@@ -395,6 +399,7 @@ struct TssView: View {
                                showAlert = true
                             }
                         } catch {
+
                             alertContent = "Signing could not be completed. please try again"
                             showAlert = true
                         }
@@ -431,7 +436,6 @@ struct TssView: View {
                             let evmAddress = KeyUtil.generateAddress(from: Data(hex: fullTssPubKey).suffix(64) )
                             print(evmAddress.toChecksumAddress())
 
-                            // step 2. getting signature
                             let sigs: [String] = try signatures.map { String(decoding: try JSONSerialization.data(withJSONObject: $0), as: UTF8.self) }
 
                             let params = EthTssAccountParams(publicKey: fullTssPubKey, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: tssPublicAddressInfo.nodeIndexes, tssEndpoints: tssEndpoints, authSigs: sigs)
