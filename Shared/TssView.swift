@@ -372,7 +372,7 @@ struct TssView: View {
                             let tssNonce = try TssModule.get_tss_nonce(threshold_key: threshold_key, tss_tag: selected_tag)
 
                             let keypoint = try KeyPoint(address: publicKey)
-                            let fullAddress = try "04" + keypoint.getX() + keypoint.getY()
+                            let fullAddress = try keypoint.getPublicKey(format: .FullAddress)
 
                             let params = EthTssAccountParams(publicKey: fullAddress, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: [], tssEndpoints: tssEndpoints, authSigs: sigs)
 
