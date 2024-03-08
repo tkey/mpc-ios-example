@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import tkey_pkg
 
 struct RecoveryView: View {
     var recover: (String) async throws -> Void

@@ -1,4 +1,5 @@
 {
+  "originHash" : "e732749c7058f7671b4b14f915ff2b9bd4154d8fdb8270ce8592cdaa9a7c6216",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -28,12 +29,21 @@
       }
     },
     {
+      "identity" : "curvelib.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tkey/curvelib.swift",
+      "state" : {
+        "revision" : "7dad3bf1793de263f83406c08c18c9316abf082f",
+        "version" : "0.1.2"
+      }
+    },
+    {
       "identity" : "customauth-swift-sdk",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/torusresearch/customauth-swift-sdk",
       "state" : {
-        "revision" : "57bd8dad1ab4b6c320945fdd84d09ea0f6f81486",
-        "version" : "7.0.0"
+        "revision" : "0f4b42136982e8cd21d57b2249505f30691f1ead",
+        "version" : "7.0.1"
       }
     },
     {
@@ -41,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/torusresearch/fetch-node-details-swift.git",
       "state" : {
-        "revision" : "68459eb481c382bfbbe28345b8eb25b3897c7447",
-        "version" : "5.0.0"
+        "revision" : "d591af500f32ce3c88d04af9bb74d746585acfea",
+        "version" : "5.1.0"
       }
     },
     {
@@ -158,8 +168,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tkey/tkey-mpc-swift",
       "state" : {
-        "branch" : "alpha",
-        "revision" : "cf6fae63427cab2f8637fce371992eaa3353258c"
+        "revision" : "195235357f36edec4ec87189c222e1992403ad4f",
+        "version" : "2.0.1"
       }
     },
     {
@@ -167,8 +177,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/torusresearch/torus-utils-swift",
       "state" : {
-        "branch" : "alpha",
-        "revision" : "02707f07324226edee4d26862f743b30a6c1d4a5"
+        "revision" : "3fb829e71caa275556a067a1ffa1ca579bafbf8e",
+        "version" : "7.0.1"
       }
     },
     {
@@ -176,8 +186,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/torusresearch/tss-client-swift/",
       "state" : {
-        "revision" : "a5f54880550d7c0f2979e06290a1ac0941626b3f",
-        "version" : "1.0.12"
+        "revision" : "9590a1d784177d4679eca62d4dbfe781e9870c40",
+        "version" : "2.0.2"
       }
     },
     {
@@ -185,8 +195,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tkey/web3-swift-mpc-provider/",
       "state" : {
-        "revision" : "206ae41face7590b8642703005d768c633015d75",
-        "version" : "1.0.0"
+        "revision" : "4945e281822147b1faa2dea782ebe7b912343ddf",
+        "version" : "2.0.1"
       }
     },
     {
@@ -208,5 +218,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

@@ -1,9 +1,9 @@
 import SwiftUI
-import tkey_pkg
 import TorusUtils
 import FetchNodeDetails
 import CommonSources
 import CustomAuth
+import tkey_mpc_swift
 
 enum SpinnerLocation {
     case add_password_btn, change_password_btn, init_reconstruct_btn, nowhere

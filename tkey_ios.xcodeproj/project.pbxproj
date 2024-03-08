@@ -12,7 +12,6 @@
 		14446F3929CD644100B7EFE2 /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14446F3829CD644100B7EFE2 /* LoginModel.swift */; };
 		14446F3A29CD644100B7EFE2 /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14446F3829CD644100B7EFE2 /* LoginModel.swift */; };
 		146B0D6929CC01F7000473A8 /* CustomAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 146B0D6829CC01F7000473A8 /* CustomAuth */; };
-		14A112C62A94F312002E22D4 /* ThresholdKey in Frameworks */ = {isa = PBXBuildFile; productRef = 14A112C52A94F312002E22D4 /* ThresholdKey */; };
 		B30B6B2928BCC8AC00812C1E /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30B6B2828BCC8AC00812C1E /* Tests_iOS.swift */; };
 		B30B6B2B28BCC8AC00812C1E /* Tests_iOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30B6B2A28BCC8AC00812C1E /* Tests_iOSLaunchTests.swift */; };
 		B30B6B3528BCC8AC00812C1E /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30B6B3428BCC8AC00812C1E /* Tests_macOS.swift */; };
@@ -23,7 +22,7 @@
 		B30B6B3B28BCC8AC00812C1E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30B6B1128BCC8A900812C1E /* ContentView.swift */; };
 		B30B6B3C28BCC8AC00812C1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B30B6B1228BCC8AC00812C1E /* Assets.xcassets */; };
 		B30B6B3D28BCC8AC00812C1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B30B6B1228BCC8AC00812C1E /* Assets.xcassets */; };
-		B3B8BF5D2A73C66B007B6170 /* tss-client-swift in Frameworks */ = {isa = PBXBuildFile; productRef = B3B8BF5C2A73C66B007B6170 /* tss-client-swift */; };
+		B33DD88A2B9AC576006EDB31 /* tkey-mpc-swift in Frameworks */ = {isa = PBXBuildFile; productRef = B33DD8892B9AC576006EDB31 /* tkey-mpc-swift */; };
 		B3E5316629EC4E7E00174AF1 /* ThresholdKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E5316529EC4E7E00174AF1 /* ThresholdKeyView.swift */; };
 		B3E5316729EC4E7E00174AF1 /* ThresholdKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E5316529EC4E7E00174AF1 /* ThresholdKeyView.swift */; };
 		B3E5316929EC4ED000174AF1 /* LoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E5316829EC4ED000174AF1 /* LoaderView.swift */; };
@@ -100,8 +99,7 @@
 			files = (
 				146B0D6929CC01F7000473A8 /* CustomAuth in Frameworks */,
 				F0B2A2282A9758C000DA2F79 /* Web3SwiftMpcProvider in Frameworks */,
-				B3B8BF5D2A73C66B007B6170 /* tss-client-swift in Frameworks */,
-				14A112C62A94F312002E22D4 /* ThresholdKey in Frameworks */,
+				B33DD88A2B9AC576006EDB31 /* tkey-mpc-swift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,9 +220,8 @@
 			name = "tkey_ios (iOS)";
 			packageProductDependencies = (
 				146B0D6829CC01F7000473A8 /* CustomAuth */,
-				B3B8BF5C2A73C66B007B6170 /* tss-client-swift */,
-				14A112C52A94F312002E22D4 /* ThresholdKey */,
 				F0B2A2272A9758C000DA2F79 /* Web3SwiftMpcProvider */,
+				B33DD8892B9AC576006EDB31 /* tkey-mpc-swift */,
 			);
 			productName = "tkey_ios (iOS)";
 			productReference = B30B6B1728BCC8AC00812C1E /* tkey_ios.app */;
@@ -326,9 +323,8 @@
 			mainGroup = B30B6B0A28BCC8A900812C1E;
 			packageReferences = (
 				146B0D6729CC01F7000473A8 /* XCRemoteSwiftPackageReference "customauth-swift-sdk" */,
-				B3B8BF5B2A73C66B007B6170 /* XCRemoteSwiftPackageReference "tss-client-swift" */,
-				14A112C42A94F312002E22D4 /* XCRemoteSwiftPackageReference "tkey-mpc-swift" */,
 				F0B2A2262A9758C000DA2F79 /* XCRemoteSwiftPackageReference "web3-swift-mpc-provider" */,
+				B33DD8882B9AC576006EDB31 /* XCRemoteSwiftPackageReference "tkey-mpc-swift" */,
 			);
 			productRefGroup = B30B6B1828BCC8AC00812C1E /* Products */;
 			projectDirPath = "";
@@ -897,23 +893,15 @@
 			repositoryURL = "https://github.com/torusresearch/customauth-swift-sdk";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 7.0.0;
+				minimumVersion = 7.0.1;
 			};
 		};
-		14A112C42A94F312002E22D4 /* XCRemoteSwiftPackageReference "tkey-mpc-swift" */ = {
+		B33DD8882B9AC576006EDB31 /* XCRemoteSwiftPackageReference "tkey-mpc-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tkey/tkey-mpc-swift";
 			requirement = {
-				branch = alpha;
-				kind = branch;
-			};
-		};
-		B3B8BF5B2A73C66B007B6170 /* XCRemoteSwiftPackageReference "tss-client-swift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/torusresearch/tss-client-swift/";
-			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.10;
+				minimumVersion = 2.0.1;
 			};
 		};
 		F0B2A2262A9758C000DA2F79 /* XCRemoteSwiftPackageReference "web3-swift-mpc-provider" */ = {
@@ -921,7 +909,7 @@
 			repositoryURL = "https://github.com/tkey/web3-swift-mpc-provider/";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				minimumVersion = 2.0.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -932,15 +920,10 @@
 			package = 146B0D6729CC01F7000473A8 /* XCRemoteSwiftPackageReference "customauth-swift-sdk" */;
 			productName = CustomAuth;
 		};
-		14A112C52A94F312002E22D4 /* ThresholdKey */ = {
+		B33DD8892B9AC576006EDB31 /* tkey-mpc-swift */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 14A112C42A94F312002E22D4 /* XCRemoteSwiftPackageReference "tkey-mpc-swift" */;
-			productName = ThresholdKey;
-		};
-		B3B8BF5C2A73C66B007B6170 /* tss-client-swift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B3B8BF5B2A73C66B007B6170 /* XCRemoteSwiftPackageReference "tss-client-swift" */;
-			productName = "tss-client-swift";
+			package = B33DD8882B9AC576006EDB31 /* XCRemoteSwiftPackageReference "tkey-mpc-swift" */;
+			productName = "tkey-mpc-swift";
 		};
 		F0B2A2272A9758C000DA2F79 /* Web3SwiftMpcProvider */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -4,11 +4,11 @@ import CryptoKit
 import FetchNodeDetails
 import Foundation
 import SwiftUI
-import tkey_pkg
 import TorusUtils
 import tss_client_swift
 import Web3SwiftMpcProvider
 import web3
+import tkey_mpc_swift
 
 struct TssView: View {
     @Binding var threshold_key: ThresholdKey!
