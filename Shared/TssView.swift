@@ -442,7 +442,7 @@ struct TssView: View {
                             let chainID = 43113
 //                            let RPC_URL = "https://rpc.ankr.com/eth_goerli"
 //                            let chainID = 5
-                            let web3Client = EthereumHttpClient(url: URL(string: RPC_URL)!)
+                            let web3Client = EthereumHttpClient(url: URL(string: RPC_URL)!, network: EthereumNetwork.sepolia )
 
                             let amount = 0.001
                             let toAddress = tssAccount.address
