@@ -438,8 +438,8 @@ struct TssView: View {
 
                             let tssAccount = EthereumTssAccount(params: params)
 
-                            let RPC_URL = "https://api.avax-test.network/ext/bc/C/rpc"
-                            let chainID = 43113
+                            let RPC_URL = "https://rpc.sepolia.org"
+                            let chainID = 11155111
 //                            let RPC_URL = "https://rpc.ankr.com/eth_goerli"
 //                            let chainID = 5
                             let web3Client = EthereumHttpClient(url: URL(string: RPC_URL)!, network: EthereumNetwork.sepolia )
