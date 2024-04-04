@@ -562,7 +562,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2Q63NCPY55;
+				DEVELOPMENT_TEAM = 4LS2P2RS45;
 				ENABLE_PREVIEWS = YES;
 				EXCLUDED_ARCHS = "";
 				GENERATE_INFOPLIST_FILE = YES;
@@ -601,7 +601,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2Q63NCPY55;
+				DEVELOPMENT_TEAM = 4LS2P2RS45;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -893,7 +893,7 @@
 			repositoryURL = "https://github.com/torusresearch/customauth-swift-sdk";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 7.0.1;
+				minimumVersion = 9.0.0;
 			};
 		};
 		B33DD8882B9AC576006EDB31 /* XCRemoteSwiftPackageReference "tkey-mpc-swift" */ = {
@@ -901,7 +901,7 @@
 			repositoryURL = "https://github.com/tkey/tkey-mpc-swift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.1;
+				minimumVersion = 2.1.0;
 			};
 		};
 		F0B2A2262A9758C000DA2F79 /* XCRemoteSwiftPackageReference "web3-swift-mpc-provider" */ = {
@@ -909,7 +909,7 @@
 			repositoryURL = "https://github.com/tkey/web3-swift-mpc-provider/";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.1;
+				minimumVersion = 2.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

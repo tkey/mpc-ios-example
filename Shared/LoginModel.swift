@@ -1,6 +1,11 @@
 import Foundation
 import CustomAuth
 import TorusUtils
+import CommonSources
+
+let ClientID = "BPi5PB_UiIZ-cPz1GtV5i1I2iOSOHuimiXBI0e-Oe_u6X3oVAbCiAZOTEBtTXw4tsluTITPqA8zMsfxIKMjiqNQ"
+
+let Network = TorusNetwork.sapphire(.SAPPHIRE_MAINNET)
 
 class LoginModel: ObservableObject {
     @Published var loggedIn: Bool = false
@@ -23,21 +28,29 @@ class LoginModel: ObservableObject {
     }
 
     func loginWithCustomAuth() {
+
         Task {
+            let verifier = "w3a-google-demo"
             let sub = SubVerifierDetails(loginType: .web,
                                          loginProvider: .google,
-                                         clientId: "221898609709-obfn3p63741l5333093430j3qeiinaa8.apps.googleusercontent.com",
-                                         verifier: "google-lrc",
+                                         clientId: "519228911939-cri01h55lsjbsia1k7ll6qpalrus75ps.apps.googleusercontent.com",
+                                         verifier: verifier,
                                          redirectURL: "tdsdk://tdsdk/oauthCallback",
                                          browserRedirectURL: "https://scripts.toruswallet.io/redirect.html")
-            let tdsdk = CustomAuth( aggregateVerifierType: .singleLogin, aggregateVerifier: "google-lrc", subVerifierDetails: [sub], network: .sapphire(.SAPPHIRE_MAINNET), enableOneKey: true)
-            let data = try await tdsdk.triggerLogin()
-            print(data)
+            let tdsdk = CustomAuth( web3AuthClientId: ClientID, aggregateVerifierType: .singleLogin, aggregateVerifier: verifier, subVerifierDetails: [sub], network: Network, enableOneKey: true)
 
-            await MainActor.run(body: {
-                self.userData = data
-                loggedIn = true
-            })
+            do {
+                let data = try await tdsdk.triggerLogin()
+                print(data)
+
+                await MainActor.run(body: {
+                    self.userData = data
+                    loggedIn = true
+                })
+            } catch {
+                print(error)
+            }
+
         }
     }
 
