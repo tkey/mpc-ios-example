@@ -1,7 +1,11 @@
 import Foundation
 import CustomAuth
 import TorusUtils
+import CommonSources
+
 let ClientID = "BPi5PB_UiIZ-cPz1GtV5i1I2iOSOHuimiXBI0e-Oe_u6X3oVAbCiAZOTEBtTXw4tsluTITPqA8zMsfxIKMjiqNQ"
+
+let Network = TorusNetwork.sapphire(.SAPPHIRE_MAINNET)
 
 class LoginModel: ObservableObject {
     @Published var loggedIn: Bool = false
@@ -33,9 +37,11 @@ class LoginModel: ObservableObject {
                                          verifier: verifier,
                                          redirectURL: "tdsdk://tdsdk/oauthCallback",
                                          browserRedirectURL: "https://scripts.toruswallet.io/redirect.html")
-            let tdsdk = CustomAuth( web3AuthClientId: ClientID, aggregateVerifierType: .singleLogin, aggregateVerifier: verifier, subVerifierDetails: [sub], network: .sapphire(.SAPPHIRE_DEVNET), enableOneKey: true)
+            let tdsdk = CustomAuth( web3AuthClientId: ClientID, aggregateVerifierType: .singleLogin, aggregateVerifier: verifier, subVerifierDetails: [sub], network: Network, enableOneKey: true)
+
             do {
                 let data = try await tdsdk.triggerLogin()
+                print(data)
 
                 await MainActor.run(body: {
                     self.userData = data
