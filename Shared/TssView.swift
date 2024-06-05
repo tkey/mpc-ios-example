@@ -261,14 +261,24 @@ struct TssView: View {
                             // get factor key from keychain if input is empty
 
                             showSpinner = true
+
+                            let allPub = try await TssModule.get_all_factor_pub(threshold_key: threshold_key, tss_tag: selected_tag)
+                            if allPub.count <= 1 {
+                                alertContent = "Cannot delete last factor"
+                                showAlert = true
+                                showSpinner = false
+                                return
+                            }
+
                             var deleteFactorKey: String?
                             var deleteFactor: String?
                             do {
                                 let allFactorPub = try await TssModule.get_all_factor_pub(threshold_key: threshold_key, tss_tag: selected_tag)
                                 print(allFactorPub)
                                 // filterout device factor
-                                let filterFactorPub = allFactorPub.filter({ $0 != deviceFactorPub })
-                                print(filterFactorPub)
+                                let filterFactorPub = allFactorPub.filter({ $0 != deviceFactorPub && $0 != selectedFactorPub })
+
+                                if filterFactorPub.count == 0 { throw "No suitable factor to be delete "}
 
                                 deleteFactor = filterFactorPub[0]
 
@@ -279,11 +289,13 @@ struct TssView: View {
                             } catch {
                                 alertContent = "There is no extra factor key to be deleted"
                                 showAlert = true
+                                showSpinner = false
                                 return
                             }
                             guard let deleteFactorKey = deleteFactorKey else {
                                 alertContent = "There is no extra factor key to be deleted"
                                 showAlert = true
+                                showSpinner = false
                                 return
                             }
 
@@ -315,6 +327,15 @@ struct TssView: View {
                 }
                 Button(action: {
                     Task {
+                        let allPub = try await TssModule.get_all_factor_pub(threshold_key: threshold_key, tss_tag: selected_tag)
+
+                        if allPub.count <= 1 {
+                            alertContent = "Cannot delete last factor"
+                            showAlert = true
+                            showSpinner = false
+                            return
+                        }
+
                         var deleteFactorKey: String = ""
                         do {
                             showSpinner = true
@@ -326,7 +347,9 @@ struct TssView: View {
                             alertContent = "factor was deleted"
                             showAlert = true
                             showSpinner = false
+                            return
                         }
+
                         do {
                             let sigs: [String] = try signatures.map { String(decoding: try JSONSerialization.data(withJSONObject: $0), as: UTF8.self) }
                             try await TssModule.delete_factor_pub(threshold_key: threshold_key, tss_tag: selected_tag, factor_key: deleteFactorKey, auth_signatures: sigs, delete_factor_pub: deviceFactorPub, nodeDetails: nodeDetails!, torusUtils: torusUtils!)
