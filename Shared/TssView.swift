@@ -4,7 +4,7 @@ import FetchNodeDetails
 import Foundation
 import SwiftUI
 import TorusUtils
-import tss_client_swift
+import tssClientSwift
 import Web3SwiftMpcProvider
 import web3
 import tkey
@@ -375,7 +375,7 @@ struct TssView: View {
 
                             let params = EthTssAccountParams(publicKey: fullAddress, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: [], tssEndpoints: tssEndpoints, authSigs: sigs)
 
-                            let account = EthereumTssAccount(params: params)
+                            let account = try EthereumTssAccount(params: params)
 
                             let msg = "hello world"
                             let signature = try account.sign(message: msg)
@@ -383,8 +383,8 @@ struct TssView: View {
                             let s = BigInt( sign: .plus, magnitude: BigUInt(signature.prefix(64).suffix(32)))
                             let v = UInt8(signature.suffix(1).toHexString(), radix: 16 )!
 
-                            let msgHash = TSSHelpers.hashMessage(message: msg)
-                            if TSSHelpers.verifySignature(msgHash: msgHash, s: s, r: r, v: v, pubKey: Data(hex: fullAddress)) {
+                            let msgHash = try TSSHelpers.hashMessage(message: msg)
+                            if TSSHelpers.verifySignature(msgHash: msgHash, s: s, r: r, v: v, pubKey: Data(hex: fullAddress)!) {
                                let sigHex = try TSSHelpers.hexSignature(s: s, r: r, v: v)
                                alertContent = "Signature: " + sigHex
                                showAlert = true
@@ -427,7 +427,7 @@ struct TssView: View {
                             let tssPubKeyPoint = try KeyPoint(address: finalPubKey)
                             let fullTssPubKey = try tssPubKeyPoint.getPublicKey(format: PublicKeyEncoding.FullAddress)
 
-                            let evmAddress = KeyUtil.generateAddress(from: Data(hex: fullTssPubKey).suffix(64) )
+                            let evmAddress = KeyUtil.generateAddress(from: Data(hex: fullTssPubKey)!.suffix(64) )
                             print(evmAddress.toChecksumAddress())
 
                             // step 2. getting signature
@@ -435,7 +435,7 @@ struct TssView: View {
 
                             let params = EthTssAccountParams(publicKey: fullTssPubKey, factorKey: factorKey, tssNonce: tssNonce, tssShare: tssShare, tssIndex: tssIndex, selectedTag: selected_tag, verifier: verifier, verifierID: verifierId, nodeIndexes: tssPublicAddressInfo.nodeIndexes, tssEndpoints: tssEndpoints, authSigs: sigs)
 
-                            let tssAccount = EthereumTssAccount(params: params)
+                            let tssAccount = try EthereumTssAccount(params: params)
 
                             let RPC_URL = "https://rpc.sepolia.org"
                             let chainID = 11155111

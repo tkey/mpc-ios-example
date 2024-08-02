@@ -1,9 +1,10 @@
 import CustomAuth
 import Foundation
+import FetchNodeDetails
 import TorusUtils
 
 let ClientID = "BPi5PB_UiIZ-cPz1GtV5i1I2iOSOHuimiXBI0e-Oe_u6X3oVAbCiAZOTEBtTXw4tsluTITPqA8zMsfxIKMjiqNQ"
-let Network = TorusNetwork.sapphire(.SAPPHIRE_MAINNET)
+let Network: TorusNetwork = .sapphire(.SAPPHIRE_MAINNET)
 let verifier = "w3a-google-demo"
 
 class LoginModel: ObservableObject {
@@ -29,7 +30,7 @@ class LoginModel: ObservableObject {
     func loginWithCustomAuth() {
         Task {
             do {
-                let tdsdk = try CustomAuth(config: CustomAuthArgs(urlScheme: "tdsdk://tdsdk/oauthCallback", network: .sapphire(.SAPPHIRE_MAINNET), enableOneKey: true, web3AuthClientId: ClientID))
+                let tdsdk = try CustomAuth(config: CustomAuthArgs(urlScheme: "tdsdk://tdsdk/oauthCallback", network: Network, enableOneKey: true, web3AuthClientId: ClientID))
 
                 let data = try await tdsdk.triggerLogin(args: SubVerifierDetails(typeOfLogin: .google, verifier: verifier, clientId: "519228911939-cri01h55lsjbsia1k7ll6qpalrus75ps.apps.googleusercontent.com", redirectURL: "https://scripts.toruswallet.io/redirect.html"))
 

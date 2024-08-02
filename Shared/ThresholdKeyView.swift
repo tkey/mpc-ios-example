@@ -144,12 +144,15 @@ struct ThresholdKeyView: View {
 
             let postboxkey = finalKeyData.privKey
 
+            verifier = userData.singleVerifierResponse.userInfo.verifier
+            verifierId = userData.singleVerifierResponse.userInfo.verifierId
+
             postboxkeyGlobal = postboxkey
             let sessionData = userData.torusKey.sessionData
             let sessionTokenData = sessionData.sessionTokenData
 
             signatures = sessionTokenData.map { token in
-                return [  "data": Data(hex: token!.token).base64EncodedString(),
+                return [  "data": token!.token,
                            "sig": token!.signature ]
             }
             assert(signatures.isEmpty != true)

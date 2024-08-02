@@ -11,15 +11,6 @@
       }
     },
     {
-      "identity" : "cryptoswift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/krzyzanowskim/CryptoSwift.git",
-      "state" : {
-        "revision" : "c9c3df6ab812de32bae61fc0cd1bf6d45170ebf0",
-        "version" : "1.8.2"
-      }
-    },
-    {
       "identity" : "curvelib.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tkey/curvelib.swift",
@@ -69,8 +60,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/GigaBitcoin/secp256k1.swift.git",
       "state" : {
-        "revision" : "1a14e189def5eaa92f839afdd2faad8e43b61a6e",
-        "version" : "0.12.2"
+        "revision" : "9683e8e311c76d8114cd308b697dad2f9fc58fed",
+        "version" : "0.17.0"
       }
     },
     {
@@ -150,8 +141,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-nio-http2.git",
       "state" : {
-        "revision" : "a0224f3d20438635dd59c9fcc593520d80d131d0",
-        "version" : "1.33.0"
+        "revision" : "b5f7062b60e4add1e8c343ba4eb8da2e324b3a94",
+        "version" : "1.34.0"
       }
     },
     {
@@ -195,7 +186,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/torusresearch/torus-utils-swift",
       "state" : {
-        "revision" : "3fb829e71caa275556a067a1ffa1ca579bafbf8e",
+        "revision" : "303dc2cf41db7c10f769855edad0e717ced2d554",
         "version" : "9.0.0"
       }
     },
@@ -204,8 +195,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/torusresearch/tss-client-swift.git",
       "state" : {
-        "revision" : "e1262449b2810b10c7ac2b29215aebf4d8f422f7",
-        "version" : "1.0.15"
+        "branch" : "4.0.1",
+        "revision" : "508e6df4ff34f7e40df99cec0f0a6dbc4e319aa7"
       }
     },
     {
@@ -213,8 +204,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tkey/web3-swift-mpc-provider/",
       "state" : {
-        "revision" : "162be0fa5c5130965ce98365fd9dd7b2503d76a9",
-        "version" : "1.0.1"
+        "branch" : "spm_fix_path",
+        "revision" : "bf6909974c278e791b803a189cee4ec1858141c3"
       }
     },
     {
