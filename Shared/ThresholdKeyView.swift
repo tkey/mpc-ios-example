@@ -1,9 +1,8 @@
 import SwiftUI
 import TorusUtils
 import FetchNodeDetails
-import CommonSources
 import CustomAuth
-import tkey_mpc_swift
+import tkey
 
 enum SpinnerLocation {
     case add_password_btn, change_password_btn, init_reconstruct_btn, nowhere
@@ -15,7 +14,7 @@ enum SpinnerLocation {
 // }
 
 struct ThresholdKeyView: View {
-    @State var userData: TorusKeyData
+    @State var userData: TorusLoginResponse
     @State private var showAlert = false
     @State private var alertContent = ""
     @State private var totalShares = 0
@@ -53,18 +52,8 @@ struct ThresholdKeyView: View {
          showAlert = true
          alertContent = "Resetting your accuont.."
          do {
-             guard let finalKeyData = userData.torusKey.finalKeyData else {
-                 alertContent = "Failed to get public address from userinfo"
-                 showAlert = true
-                 showSpinner = SpinnerLocation.nowhere
-                 return
-             }
-             guard let postboxkey = finalKeyData.privKey else {
-                 alertContent = "Failed to get public address from userinfo"
-                 showAlert = true
-                 showSpinner = SpinnerLocation.nowhere
-                 return
-             }
+             let finalKeyData = userData.torusKey
+             let postboxkey = finalKeyData.finalKeyData.privKey
              let temp_storage_layer = try StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
              let temp_service_provider = try ServiceProvider(enable_logging: true, postbox_key: postboxkey)
              let temp_threshold_key = try ThresholdKey(
@@ -151,38 +140,12 @@ struct ThresholdKeyView: View {
     func initialize () {
         Task {
             showSpinner = SpinnerLocation.init_reconstruct_btn
-            guard let finalKeyData = userData.torusKey.finalKeyData else {
-                alertContent = "Failed to get public address from userinfo"
-                showAlert = true
-                showSpinner = SpinnerLocation.nowhere
-                return
-            }
+            let finalKeyData = userData.torusKey.finalKeyData
 
-            guard let verifierLocal = userData.userInfo["verifier"] as? String, let verifierIdLocal = userData.userInfo["verifierId"] as? String else {
-                alertContent = "Failed to get verifier or verifierId from userinfo"
-                showAlert = true
-                showSpinner = SpinnerLocation.nowhere
-                return
-            }
-            verifier = verifierLocal
-            verifierId = verifierIdLocal
+            let postboxkey = finalKeyData.privKey
 
-            guard let postboxkey = finalKeyData.privKey else {
-                alertContent = "Failed to get postboxkey"
-                showAlert = true
-                showSpinner = SpinnerLocation.nowhere
-                return
-            }
-
-            print(finalKeyData)
-            print(postboxkey)
             postboxkeyGlobal = postboxkey
-            guard let sessionData = userData.torusKey.sessionData else {
-                alertContent = "Failed to get sessionData"
-                showAlert = true
-                showSpinner = SpinnerLocation.nowhere
-                return
-            }
+            let sessionData = userData.torusKey.sessionData
             let sessionTokenData = sessionData.sessionTokenData
 
             signatures = sessionTokenData.map { token in
@@ -197,9 +160,9 @@ struct ThresholdKeyView: View {
                 showSpinner = SpinnerLocation.nowhere
                 return
             }
-            torusUtils = TorusUtils( enableOneKey: true,
-                                     network: .sapphire(.SAPPHIRE_MAINNET)
-                                     )
+
+            torusUtils = try TorusUtils(params: TorusOptions(clientId: "Client ID", network: .sapphire(.SAPPHIRE_MAINNET), enableOneKey: true))
+
             let fnd = NodeDetailManager(network: .sapphire(.SAPPHIRE_MAINNET))
             nodeDetails = try await fnd.getNodeDetails(verifier: verifier, verifierID: verifierId)
 
@@ -489,13 +452,8 @@ struct ThresholdKeyView: View {
                                         showAlert = true
                                         alertContent = "Resetting your accuont.."
                                         do {
-                                            guard let finalKeyData = userData.torusKey.finalKeyData else {
-                                                alertContent = "Failed to get public address from userinfo"
-                                                showAlert = true
-                                                showSpinner = SpinnerLocation.nowhere
-                                                return
-                                            }
-                                            let postboxkey = finalKeyData.privKey!
+                                            let finalKeyData = userData.torusKey.finalKeyData
+                                            let postboxkey = finalKeyData.privKey
                                             let temp_storage_layer = try StorageLayer(enable_logging: true, host_url: "https://metadata.tor.us", server_time_offset: 2)
                                             let temp_service_provider = try ServiceProvider(enable_logging: true, postbox_key: postboxkey)
                                             let temp_threshold_key = try ThresholdKey(

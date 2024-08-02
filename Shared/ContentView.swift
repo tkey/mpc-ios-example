@@ -15,7 +15,7 @@ struct ContentView: View {
                 ProgressView()
             } else {
                 if vm.loggedIn {
-                    ThresholdKeyView(userData: vm.userData)
+                    ThresholdKeyView(userData: vm.userData!)
                         .tabItem {
                             Image(systemName: "house.circle")
                             Text("Home")

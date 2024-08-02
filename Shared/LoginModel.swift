@@ -6,7 +6,7 @@ class LoginModel: ObservableObject {
     @Published var loggedIn: Bool = false
     @Published var isLoading = false
     @Published var navigationTitle: String = ""
-    @Published var userData: TorusKeyData!
+    @Published var userData: TorusLoginResponse?
 
     func setup() async {
         await MainActor.run(body: {
@@ -24,15 +24,10 @@ class LoginModel: ObservableObject {
 
     func loginWithCustomAuth() {
         Task {
-            let sub = SubVerifierDetails(loginType: .web,
-                                         loginProvider: .google,
-                                         clientId: "221898609709-obfn3p63741l5333093430j3qeiinaa8.apps.googleusercontent.com",
-                                         verifier: "google-lrc",
-                                         redirectURL: "tdsdk://tdsdk/oauthCallback",
-                                         browserRedirectURL: "https://scripts.toruswallet.io/redirect.html")
-            let tdsdk = CustomAuth( aggregateVerifierType: .singleLogin, aggregateVerifier: "google-lrc", subVerifierDetails: [sub], network: .sapphire(.SAPPHIRE_MAINNET), enableOneKey: true)
-            let data = try await tdsdk.triggerLogin()
-            print(data)
+
+            let tdsdk = try CustomAuth(config: CustomAuthArgs(urlScheme: "tdsdk://tdsdk/oauthCallback", network: .sapphire(.SAPPHIRE_MAINNET), enableOneKey: true, web3AuthClientId: "Client ID"))
+
+            let data = try await tdsdk.triggerLogin(args: SubVerifierDetails(typeOfLogin: .google, verifier: "google-lrc", clientId: "221898609709-obfn3p63741l5333093430j3qeiinaa8.apps.googleusercontent.com", redirectURL: "https://scripts.toruswallet.io/redirect.html"))
 
             await MainActor.run(body: {
                 self.userData = data

@@ -1,5 +1,4 @@
 import BigInt
-import CommonSources
 import CryptoKit
 import FetchNodeDetails
 import Foundation
@@ -8,7 +7,7 @@ import TorusUtils
 import tss_client_swift
 import Web3SwiftMpcProvider
 import web3
-import tkey_mpc_swift
+import tkey
 
 struct TssView: View {
     @Binding var threshold_key: ThresholdKey!
@@ -442,7 +441,7 @@ struct TssView: View {
                             let chainID = 43113
 //                            let RPC_URL = "https://rpc.ankr.com/eth_goerli"
 //                            let chainID = 5
-                            let web3Client = EthereumHttpClient(url: URL(string: RPC_URL)!)
+                            let web3Client = EthereumHttpClient(url: URL(string: RPC_URL)!, network: .sepolia)
 
                             let amount = 0.001
                             let toAddress = tssAccount.address
