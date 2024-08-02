@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import tkey_mpc_swift
+import tkey
 
 func convertPublicKeyFormat ( publicKey: String, outFormat: PublicKeyEncoding ) throws -> String {
     let point = try KeyPoint(address: publicKey)

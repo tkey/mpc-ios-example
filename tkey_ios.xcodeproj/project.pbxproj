@@ -22,13 +22,13 @@
 		B30B6B3B28BCC8AC00812C1E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30B6B1128BCC8A900812C1E /* ContentView.swift */; };
 		B30B6B3C28BCC8AC00812C1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B30B6B1228BCC8AC00812C1E /* Assets.xcassets */; };
 		B30B6B3D28BCC8AC00812C1E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B30B6B1228BCC8AC00812C1E /* Assets.xcassets */; };
-		B33DD88A2B9AC576006EDB31 /* tkey-mpc-swift in Frameworks */ = {isa = PBXBuildFile; productRef = B33DD8892B9AC576006EDB31 /* tkey-mpc-swift */; };
 		B3E5316629EC4E7E00174AF1 /* ThresholdKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E5316529EC4E7E00174AF1 /* ThresholdKeyView.swift */; };
 		B3E5316729EC4E7E00174AF1 /* ThresholdKeyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E5316529EC4E7E00174AF1 /* ThresholdKeyView.swift */; };
 		B3E5316929EC4ED000174AF1 /* LoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E5316829EC4ED000174AF1 /* LoaderView.swift */; };
 		B3E5316A29EC4ED000174AF1 /* LoaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E5316829EC4ED000174AF1 /* LoaderView.swift */; };
 		B3E5316F29EE75CA00174AF1 /* KeyChain.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E5316E29EE75CA00174AF1 /* KeyChain.swift */; };
 		B3E5317029EE75CA00174AF1 /* KeyChain.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E5316E29EE75CA00174AF1 /* KeyChain.swift */; };
+		B3E673252C5CB9EE0006A66B /* tkey in Frameworks */ = {isa = PBXBuildFile; productRef = B3E673242C5CB9EE0006A66B /* tkey */; };
 		DD694C2D29713D2B00B34585 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30B6B1128BCC8A900812C1E /* ContentView.swift */; };
 		F00423A22A8B64D600F11B11 /* helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00423A12A8B64D600F11B11 /* helper.swift */; };
 		F00423A32A8B64D600F11B11 /* helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00423A12A8B64D600F11B11 /* helper.swift */; };
@@ -98,8 +98,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				146B0D6929CC01F7000473A8 /* CustomAuth in Frameworks */,
+				B3E673252C5CB9EE0006A66B /* tkey in Frameworks */,
 				F0B2A2282A9758C000DA2F79 /* Web3SwiftMpcProvider in Frameworks */,
-				B33DD88A2B9AC576006EDB31 /* tkey-mpc-swift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,7 +221,7 @@
 			packageProductDependencies = (
 				146B0D6829CC01F7000473A8 /* CustomAuth */,
 				F0B2A2272A9758C000DA2F79 /* Web3SwiftMpcProvider */,
-				B33DD8892B9AC576006EDB31 /* tkey-mpc-swift */,
+				B3E673242C5CB9EE0006A66B /* tkey */,
 			);
 			productName = "tkey_ios (iOS)";
 			productReference = B30B6B1728BCC8AC00812C1E /* tkey_ios.app */;
@@ -562,9 +562,10 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4LS2P2RS45;
+				DEVELOPMENT_TEAM = 2Q63NCPY55;
 				ENABLE_PREVIEWS = YES;
 				EXCLUDED_ARCHS = "";
+				GCC_NO_COMMON_BLOCKS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -601,8 +602,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4LS2P2RS45;
+				DEVELOPMENT_TEAM = 2Q63NCPY55;
 				ENABLE_PREVIEWS = YES;
+				GCC_NO_COMMON_BLOCKS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -892,24 +894,24 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/torusresearch/customauth-swift-sdk";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 9.0.0;
+				branch = features_update;
+				kind = branch;
 			};
 		};
 		B33DD8882B9AC576006EDB31 /* XCRemoteSwiftPackageReference "tkey-mpc-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tkey/tkey-mpc-swift";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.1.0;
+				branch = update_features;
+				kind = branch;
 			};
 		};
 		F0B2A2262A9758C000DA2F79 /* XCRemoteSwiftPackageReference "web3-swift-mpc-provider" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tkey/web3-swift-mpc-provider/";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
+				branch = spm_fix_path;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -920,10 +922,10 @@
 			package = 146B0D6729CC01F7000473A8 /* XCRemoteSwiftPackageReference "customauth-swift-sdk" */;
 			productName = CustomAuth;
 		};
-		B33DD8892B9AC576006EDB31 /* tkey-mpc-swift */ = {
+		B3E673242C5CB9EE0006A66B /* tkey */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B33DD8882B9AC576006EDB31 /* XCRemoteSwiftPackageReference "tkey-mpc-swift" */;
-			productName = "tkey-mpc-swift";
+			productName = tkey;
 		};
 		F0B2A2272A9758C000DA2F79 /* Web3SwiftMpcProvider */ = {
 			isa = XCSwiftPackageProductDependency;

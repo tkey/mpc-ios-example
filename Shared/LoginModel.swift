@@ -1,17 +1,17 @@
-import Foundation
 import CustomAuth
+import Foundation
+import FetchNodeDetails
 import TorusUtils
-import CommonSources
 
 let ClientID = "BPi5PB_UiIZ-cPz1GtV5i1I2iOSOHuimiXBI0e-Oe_u6X3oVAbCiAZOTEBtTXw4tsluTITPqA8zMsfxIKMjiqNQ"
-
-let Network = TorusNetwork.sapphire(.SAPPHIRE_MAINNET)
+let Network: TorusNetwork = .sapphire(.SAPPHIRE_MAINNET)
+let verifier = "w3a-google-demo"
 
 class LoginModel: ObservableObject {
     @Published var loggedIn: Bool = false
     @Published var isLoading = false
     @Published var navigationTitle: String = ""
-    @Published var userData: TorusKeyData!
+    @Published var userData: TorusLoginResponse?
 
     func setup() async {
         await MainActor.run(body: {
@@ -28,20 +28,11 @@ class LoginModel: ObservableObject {
     }
 
     func loginWithCustomAuth() {
-
         Task {
-            let verifier = "w3a-google-demo"
-            let sub = SubVerifierDetails(loginType: .web,
-                                         loginProvider: .google,
-                                         clientId: "519228911939-cri01h55lsjbsia1k7ll6qpalrus75ps.apps.googleusercontent.com",
-                                         verifier: verifier,
-                                         redirectURL: "tdsdk://tdsdk/oauthCallback",
-                                         browserRedirectURL: "https://scripts.toruswallet.io/redirect.html")
-            let tdsdk = CustomAuth( web3AuthClientId: ClientID, aggregateVerifierType: .singleLogin, aggregateVerifier: verifier, subVerifierDetails: [sub], network: Network, enableOneKey: true)
-
             do {
-                let data = try await tdsdk.triggerLogin()
-                print(data)
+                let tdsdk = try CustomAuth(config: CustomAuthArgs(urlScheme: "tdsdk://tdsdk/oauthCallback", network: Network, enableOneKey: true, web3AuthClientId: ClientID))
+
+                let data = try await tdsdk.triggerLogin(args: SubVerifierDetails(typeOfLogin: .google, verifier: verifier, clientId: "519228911939-cri01h55lsjbsia1k7ll6qpalrus75ps.apps.googleusercontent.com", redirectURL: "https://scripts.toruswallet.io/redirect.html"))
 
                 await MainActor.run(body: {
                     self.userData = data
@@ -50,8 +41,6 @@ class LoginModel: ObservableObject {
             } catch {
                 print(error)
             }
-
         }
     }
-
 }
