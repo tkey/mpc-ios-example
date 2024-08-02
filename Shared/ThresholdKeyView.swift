@@ -161,9 +161,10 @@ struct ThresholdKeyView: View {
                 return
             }
 
-            torusUtils = try TorusUtils(params: TorusOptions(clientId: "Client ID", network: .sapphire(.SAPPHIRE_MAINNET), enableOneKey: true))
+            torusUtils = try TorusUtils(params: TorusOptions(clientId: ClientID, network: Network, enableOneKey: true))
 
-            let fnd = NodeDetailManager(network: .sapphire(.SAPPHIRE_MAINNET))
+            let fnd = NodeDetailManager(network: Network)
+
             nodeDetails = try await fnd.getNodeDetails(verifier: verifier, verifierID: verifierId)
 
             tssEndpoint = nodeDetails!.torusNodeTSSEndpoints
