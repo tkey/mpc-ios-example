@@ -910,8 +910,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tkey/web3-swift-mpc-provider/";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.1;
+				branch = spm_fix_path;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
